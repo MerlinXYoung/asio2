@@ -65,7 +65,7 @@ namespace asio2::detail
 
 						// Read a request
 						http::async_read(derive.stream(), derive.buffer().base(), derive.req_,
-							asio::bind_executor(derive.io().strand(), make_allocator(derive.rallocator(),
+							asio::bind_executor(derive.io(), make_allocator(derive.rallocator(),
 								[&derive, self_ptr = std::move(this_ptr), condition = std::move(condition)]
 						(const error_code & ec, std::size_t bytes_recvd) mutable
 						{
@@ -76,7 +76,7 @@ namespace asio2::detail
 					{
 						// Read a message into our buffer
 						derive.ws_stream().async_read(derive.buffer().base(),
-							asio::bind_executor(derive.io().strand(), make_allocator(derive.rallocator(),
+							asio::bind_executor(derive.io(), make_allocator(derive.rallocator(),
 								[&derive, self_ptr = std::move(this_ptr), condition = std::move(condition)]
 						(const error_code & ec, std::size_t bytes_recvd) mutable
 						{
@@ -92,7 +92,7 @@ namespace asio2::detail
 
 					// Receive the HTTP response
 					http::async_read(derive.stream(), derive.buffer().base(), derive.rep_,
-						asio::bind_executor(derive.io().strand(), make_allocator(derive.rallocator(),
+						asio::bind_executor(derive.io(), make_allocator(derive.rallocator(),
 							[&derive, self_ptr = std::move(this_ptr), condition = std::move(condition)]
 					(const error_code & ec, std::size_t bytes_recvd) mutable
 					{

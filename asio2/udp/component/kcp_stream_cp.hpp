@@ -52,7 +52,7 @@ namespace asio2::detail
 		 * @constructor
 		 */
 		kcp_stream_cp(derived_t& d, io_t& io)
-			: derive(d), kcp_timer_(io.context())
+			: derive(d), kcp_timer_(io)
 		{
 		}
 
@@ -131,7 +131,7 @@ namespace asio2::detail
 			std::uint32_t clock2 = kcp::ikcp_check(this->kcp_, clock1);
 
 			this->kcp_timer_.expires_after(std::chrono::milliseconds(clock2 - clock1));
-			this->kcp_timer_.async_wait(asio::bind_executor(derive.io().strand(),
+			this->kcp_timer_.async_wait(asio::bind_executor(derive.io(),
 				make_allocator(this->tallocator_,
 					[this, self_ptr = std::move(this_ptr)](const error_code & ec) mutable
 			{
@@ -236,7 +236,7 @@ namespace asio2::detail
 
 					// step 2 : client wait for recv synack util connect timeout or recvd some data
 					derive.socket().async_receive(derive.buffer().prepare(derive.buffer().pre_size()),
-						asio::bind_executor(derive.io().strand(), make_allocator(derive.rallocator(),
+						asio::bind_executor(derive.io(), make_allocator(derive.rallocator(),
 							[this, this_ptr = std::move(self_ptr), condition = std::move(condition),
 							timer = std::move(timer)]
 					(const error_code & ec, std::size_t bytes_recvd) mutable

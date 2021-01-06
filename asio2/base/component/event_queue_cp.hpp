@@ -91,6 +91,25 @@ namespace asio2::detail
 		 * push a task to the tail of the event queue
 		 * Callback signature : bool()
 		 */
+#if 1
+		template<class Callback>
+		inline derived_t & push_event(Callback&& f)
+		{
+			derived_t& derive = static_cast<derived_t&>(*this);
+
+			derive.dispatch([this, &derive, p = derive.selfptr(), f = std::forward<Callback>(f)]() mutable
+			{
+				bool empty = this->events_.empty();
+				this->events_.emplace(std::move(f));
+				if (empty)
+				{
+					(this->events_.front())(event_queue_guard<derived_t>{derive});
+				}
+			});
+
+			return (derive);
+		}
+#else
 		template<class Callback>
 		inline derived_t & push_event(Callback&& f)
 		{
@@ -120,12 +139,35 @@ namespace asio2::detail
 
 			return (derive);
 		}
-
+#endif
 	protected:
 		/**
 		 * Removes an element from the front of the event queue.
 		 * and then execute the next element of the queue.
 		 */
+#if 1
+		template<typename = void>
+		inline derived_t & next_event()
+		{
+			derived_t& derive = static_cast<derived_t&>(*this);
+
+			derive.dispatch([this, &derive, p = derive.selfptr()]() mutable
+			{
+				ASIO2_ASSERT(!this->events_.empty());
+				if (!this->events_.empty())
+				{
+					this->events_.pop();
+
+					if (!this->events_.empty())
+					{
+						(this->events_.front())(event_queue_guard<derived_t>{derive});
+					}
+				}
+			});
+
+			return (derive);
+		}
+#else
 		template<typename = void>
 		inline derived_t & next_event()
 		{
@@ -163,7 +205,7 @@ namespace asio2::detail
 
 			return (derive);
 		}
-
+#endif
 	protected:
 		std::queue<std::function<bool(event_queue_guard<derived_t>&&)>> events_;
 	};

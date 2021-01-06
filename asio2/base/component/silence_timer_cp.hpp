@@ -31,7 +31,7 @@ namespace asio2::detail
 		 * @constructor
 		 */
 		explicit silence_timer_cp(io_t & io)
-			: silence_timer_(io.context())
+			: silence_timer_(io)
 		{
 			this->silence_timer_canceled_.clear();
 		}
@@ -71,7 +71,7 @@ namespace asio2::detail
 			if (duration > std::chrono::milliseconds(0))
 			{
 				this->silence_timer_.expires_after(duration);
-				this->silence_timer_.async_wait(asio::bind_executor(derive.io().strand(),
+				this->silence_timer_.async_wait(asio::bind_executor(derive.io(),
 					[&derive, self_ptr = std::move(this_ptr)](const error_code & ec)
 				{
 					derive._handle_silence_timer(ec, std::move(self_ptr));

@@ -660,7 +660,7 @@ namespace asio2::detail
 				auto id = (condition.send_parser())(fn_data());
 
 				std::shared_ptr<asio::steady_timer> timer =
-					std::make_shared<asio::steady_timer>(derive.io().context());
+					std::make_shared<asio::steady_timer>(derive.io());
 
 				derive.push_event([&derive, this_ptr = std::move(this_ptr), condition = std::move(condition),
 					id = std::move(id), timer = std::move(timer),
@@ -670,7 +670,7 @@ namespace asio2::detail
 					condition.invoker().emplace(id, timer, std::move(invoker));
 
 					timer->expires_after(timeout);
-					timer->async_wait(asio::bind_executor(derive.io().strand(),
+					timer->async_wait(asio::bind_executor(derive.io(),
 						[&derive, id, this_ptr = std::move(this_ptr), condition]
 					(const error_code& ec) mutable
 					{

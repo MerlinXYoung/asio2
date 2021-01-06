@@ -175,7 +175,7 @@ namespace asio2::detail
 			// Whether or not we run on the strand, We all start the timer by post an asynchronous 
 			// event, in order to avoid unexpected problems caused by the user start or stop the 
 			// timer again in the timer callback function.
-			asio::post(derive.io().strand(), make_allocator(derive.wallocator(),
+			asio::post(derive.io(), make_allocator(derive.wallocator(),
 				[this, &derive, this_ptr = derive.selfptr(),
 				timer_handle = user_timer_handle(std::forward<TimerId>(timer_id)),
 				duration, task = std::move(t)]() mutable
@@ -191,7 +191,7 @@ namespace asio2::detail
 				else
 				{
 					timer_obj_ptr = std::make_shared<user_timer_obj>(timer_handle,
-						derive.io().context(), std::move(task));
+						derive.io(), std::move(task));
 
 					this->user_timers_[std::move(timer_handle)] = timer_obj_ptr;
 				}
@@ -199,7 +199,28 @@ namespace asio2::detail
 				derive._post_user_timers(std::move(timer_obj_ptr), duration, std::move(this_ptr));
 			}));
 		}
+#if 1
+		template<class TimerId>
+		inline void stop_timer(TimerId&& timer_id)
+		{
+			derived_t& derive = static_cast<derived_t&>(*this);
 
+			// Make sure we run on the strand
+			asio::dispatch(derive.io(),
+					make_allocator(derive.wallocator(),
+						[this, this_ptr = derive.selfptr(),
+						timer_id = std::forward<TimerId>(timer_id)]() mutable
+			{
+				auto iter = this->user_timers_.find(timer_id);
+				if (iter != this->user_timers_.end())
+				{
+					iter->second->exited = true;
+					iter->second->timer.cancel(ec_ignore);
+					this->user_timers_.erase(iter);
+				}
+			}));
+		}
+#else
 		template<class TimerId>
 		inline void stop_timer(TimerId&& timer_id)
 		{
@@ -207,7 +228,7 @@ namespace asio2::detail
 
 			// Make sure we run on the strand
 			if (!derive.io().strand().running_in_this_thread())
-				return asio::post(derive.io().strand(),
+				return asio::post(derive.io(),
 					make_allocator(derive.wallocator(),
 						[this, this_ptr = derive.selfptr(),
 						timer_id = std::forward<TimerId>(timer_id)]() mutable
@@ -223,19 +244,42 @@ namespace asio2::detail
 				this->user_timers_.erase(iter);
 			}
 		}
-
+#endif
 		/**
 		 * @function : stop session
 		 * note : this function must be noblocking,if it's blocking,will 
 		 *        cause circle lock in session_mgr::stop function
 		 */
+#if 1
+		inline void stop_all_timers()
+		{
+			derived_t& derive = static_cast<derived_t&>(*this);
+
+			// Make sure we run on the strand
+			asio::dispatch(derive.io(),
+					make_allocator(derive.wallocator(),
+						[this, this_ptr = derive.selfptr()]() mutable
+			{
+				// close user custom timers
+				for (auto &[id, timer_obj_ptr] : this->user_timers_)
+				{
+					std::ignore = id;
+					timer_obj_ptr->exited = true;
+					timer_obj_ptr->timer.cancel(ec_ignore);
+				}
+				this->user_timers_.clear();
+			}));
+
+			
+		}
+#else
 		inline void stop_all_timers()
 		{
 			derived_t& derive = static_cast<derived_t&>(*this);
 
 			// Make sure we run on the strand
 			if (!derive.io().strand().running_in_this_thread())
-				return asio::post(derive.io().strand(),
+				return asio::post(derive.io(),
 					make_allocator(derive.wallocator(),
 						[this, this_ptr = derive.selfptr()]() mutable
 			{
@@ -251,7 +295,7 @@ namespace asio2::detail
 			}
 			this->user_timers_.clear();
 		}
-
+#endif
 	protected:
 		template<class Rep, class Period>
 		inline void _post_user_timers(std::shared_ptr<user_timer_obj> timer_obj_ptr,
@@ -267,7 +311,7 @@ namespace asio2::detail
 			asio::steady_timer& timer = timer_obj_ptr->timer;
 
 			timer.expires_after(duration);
-			timer.async_wait(asio::bind_executor(derive.io().strand(),
+			timer.async_wait(asio::bind_executor(derive.io(),
 				make_allocator(derive.wallocator(),
 					[&derive, timer_ptr = std::move(timer_obj_ptr), duration,
 					self_ptr = std::move(this_ptr)](const error_code& ec) mutable

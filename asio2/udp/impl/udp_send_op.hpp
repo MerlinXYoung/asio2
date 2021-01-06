@@ -46,7 +46,7 @@ namespace asio2::detail
 		{
 			derived_t& derive = static_cast<derived_t&>(*this);
 
-			derive.stream().async_send(asio::buffer(data), asio::bind_executor(derive.io().strand(),
+			derive.stream().async_send(asio::buffer(data), asio::bind_executor(derive.io(),
 				make_allocator(derive.wallocator(),
 					[p = derive.selfptr(), callback = std::forward<Callback>(callback)]
 			(const error_code& ec, std::size_t bytes_sent) mutable
@@ -64,7 +64,7 @@ namespace asio2::detail
 			derived_t& derive = static_cast<derived_t&>(*this);
 
 			derive.stream().async_send_to(asio::buffer(data), endpoint,
-				asio::bind_executor(derive.io().strand(),
+				asio::bind_executor(derive.io(),
 					make_allocator(derive.wallocator(),
 						[p = derive.selfptr(), callback = std::forward<Callback>(callback)]
 			(const error_code& ec, std::size_t bytes_sent) mutable

@@ -179,7 +179,27 @@ namespace asio2::detail
 			// reset the callback shared_ptr, to avoid the callback owned this self shared_ptr.
 			this->websocket_router_.reset();
 		}
+#if 1
+		template<typename MatchCondition>
+		inline void _send_response(std::shared_ptr<derived_t> this_ptr,
+			condition_wrap<MatchCondition> condition)
+		{
+			ASIO2_ASSERT(this->is_http());
 
+			this->derived().dispatch([this, this_ptr = std::move(this_ptr), condition = std::move(condition)]() mutable
+			{
+				if (this->is_websocket())
+				return;
+
+				this->derived().send(std::move(this->rep_.base()),
+					[this, this_ptr = std::move(this_ptr), condition = std::move(condition)]() mutable
+				{
+					this->derived()._post_recv(std::move(this_ptr), std::move(condition));
+				});
+			});
+
+		}
+#else
 		template<typename MatchCondition>
 		inline void _send_response(std::shared_ptr<derived_t> this_ptr,
 			condition_wrap<MatchCondition> condition)
@@ -204,7 +224,7 @@ namespace asio2::detail
 				this->derived()._post_recv(std::move(this_ptr), std::move(condition));
 			});
 		}
-
+#endif
 	protected:
 		template<class Data, class Callback>
 		inline bool _do_send(Data& data, Callback&& callback)

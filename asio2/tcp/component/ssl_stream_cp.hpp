@@ -117,7 +117,7 @@ namespace asio2::detail
 
 				// when server call ssl stream sync shutdown first,if the client socket is
 				// not closed forever,then here shutdowm will blocking forever.
-				this->ssl_stream_->async_shutdown(asio::bind_executor(derive.io().strand(),
+				this->ssl_stream_->async_shutdown(asio::bind_executor(derive.io(),
 					[this, this_ptr = std::move(this_ptr), timer = std::move(timer)]
 				(const error_code& ec) mutable
 				{
@@ -182,7 +182,7 @@ namespace asio2::detail
 				});
 
 				this->ssl_stream_->async_handshake(this->ssl_type_,
-					asio::bind_executor(derive.io().strand(), make_allocator(derive.rallocator(),
+					asio::bind_executor(derive.io(), make_allocator(derive.rallocator(),
 						[&derive, self_ptr = std::move(this_ptr), g = std::move(g), condition = std::move(condition),
 						flag_ptr = std::move(flag_ptr), timer = std::move(timer)]
 				(const error_code& ec) mutable

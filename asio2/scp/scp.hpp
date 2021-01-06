@@ -119,7 +119,7 @@ namespace asio2::detail
 			, post_cp        <derived_t, args_t>()
 			, async_event_cp <derived_t, args_t>()
 			, rdc_call_cp    <derived_t, args_t>()
-			, socket_    (iopool_.get(0).context())
+			, socket_    (iopool_.get(0))
 			, rallocator_()
 			, wallocator_()
 			, listener_  ()
@@ -404,7 +404,7 @@ namespace asio2::detail
 
 				asio::detail::throw_error(ec);
 
-				asio::post(this->io_.strand(), [this, condition = std::move(condition)]() mutable
+				asio::post(this->io_, [this, condition = std::move(condition)]() mutable
 				{
 					this->derived()._start_recv(std::move(condition));
 				});
@@ -530,7 +530,7 @@ namespace asio2::detail
 		inline void _start_recv(condition_wrap<MatchCondition> condition)
 		{
 			// Connect succeeded. post recv request.
-			asio::post(this->io_.strand(), [this, condition = std::move(condition)]() mutable
+			asio::post(this->io_, [this, condition = std::move(condition)]() mutable
 			{
 				if constexpr (!std::is_same_v<MatchCondition, asio2::detail::hook_buffer_t>)
 				{

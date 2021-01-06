@@ -94,7 +94,7 @@ namespace asio2::detail
 			, event_queue_cp <derived_t, args_t>()
 			, user_data_cp   <derived_t, args_t>()
 			, alive_time_cp  <derived_t, args_t>()
-			, socket_cp      <derived_t, args_t>(iopool_.get(0).context())
+			, socket_cp      <derived_t, args_t>(iopool_.get(0))
 			, user_timer_cp  <derived_t, args_t>()
 			, post_cp        <derived_t, args_t>()
 			, udp_send_cp    <derived_t, args_t>(iopool_.get(0))
@@ -265,7 +265,7 @@ namespace asio2::detail
 				std::string p = to_string(std::forward<StrOrInt>(service));
 
 				// parse address and port
-				asio::ip::udp::resolver resolver(this->io_.context());
+				asio::ip::udp::resolver resolver(this->io_);
 				asio::ip::udp::endpoint endpoint = *resolver.resolve(h, p,
 					asio::ip::resolver_base::flags::passive |
 					asio::ip::resolver_base::flags::address_configured).begin();
@@ -410,7 +410,7 @@ namespace asio2::detail
 			{
 				this->socket_.async_receive_from(
 					this->buffer_.prepare(this->buffer_.pre_size()), this->remote_endpoint_,
-					asio::bind_executor(this->io_.strand(), make_allocator(this->rallocator_,
+					asio::bind_executor(this->io_, make_allocator(this->rallocator_,
 						[this, condition = std::move(condition)](const error_code& ec, std::size_t bytes_recvd)
 				{
 					this->derived()._handle_recv(ec, bytes_recvd, std::move(condition));

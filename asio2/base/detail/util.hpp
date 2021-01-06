@@ -178,13 +178,13 @@ namespace asio2::detail
 	std::shared_ptr<asio::steady_timer> mktimer(io_t& io, std::chrono::duration<Rep, Period> duration, Fn&& fn)
 	{
 		std::shared_ptr<asio::steady_timer> timer =
-			std::make_shared<asio::steady_timer>(io.context());
+			std::make_shared<asio::steady_timer>(io);
 		auto post = std::make_shared<std::unique_ptr<std::function<void()>>>();
 		*post = std::make_unique<std::function<void()>>(
 			[&io, duration, f = std::forward<Fn>(fn), timer, post]() mutable
 		{
 			timer->expires_after(duration);
-			timer->async_wait(asio::bind_executor(io.strand(), [&f, &post]
+			timer->async_wait(asio::bind_executor(io, [&f, &post]
 			(const error_code & ec) mutable
 			{
 				if (f(ec))

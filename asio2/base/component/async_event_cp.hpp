@@ -34,9 +34,9 @@ namespace asio2
 	class async_event : public detail::object_t<async_event>
 	{
 	public:
-		explicit async_event(detail::io_t& io)
+		explicit async_event(asio::io_context& io)
 			: event_timer_io_(io)
-			, event_timer_(io.context())
+			, event_timer_(io)
 		{
 		}
 
@@ -49,7 +49,7 @@ namespace asio2
 
 			// bind is used to adapt the user provided handler to the 
 			// timer's wait handler type requirement.
-			event_timer_.async_wait(asio::bind_executor(event_timer_io_.strand(),
+			event_timer_.async_wait(asio::bind_executor(event_timer_io_,
 				[handler = std::forward<WaitHandler>(handler),
 				this_ptr = this->derived().selfptr()](const error_code&) mutable
 			{
@@ -66,7 +66,7 @@ namespace asio2
 
 			// bind is used to adapt the user provided handler to the 
 			// timer's wait handler type requirement.
-			event_timer_.async_wait(asio::bind_executor(event_timer_io_.strand(),
+			event_timer_.async_wait(asio::bind_executor(event_timer_io_,
 				detail::make_allocator(allocator, [handler = std::forward<WaitHandler>(handler),
 					this_ptr = this->derived().selfptr()](const error_code&) mutable
 			{
@@ -85,7 +85,7 @@ namespace asio2
 
 	private:
 		/// The io (include io_context and strand) used for the timer.
-		detail::io_t     & event_timer_io_;
+		asio::io_context     & event_timer_io_;
 
 		/// Used to implementing asynchronous async_event
 		asio::steady_timer event_timer_;
@@ -121,7 +121,7 @@ namespace asio2::detail
 
 			std::shared_ptr<async_event> event_ptr = std::make_shared<async_event>(derive.io());
 
-			asio::dispatch(derive.io().strand(), make_allocator(derive.wallocator(),
+			asio::dispatch(derive.io(), make_allocator(derive.wallocator(),
 				[this, self = derive.selfptr(), event_ptr]() mutable
 			{
 				this->async_events_.emplace(event_ptr.get(), std::move(event_ptr));
@@ -142,6 +142,20 @@ namespace asio2::detail
 		/**
 		 * @function : Notify all async_events to execute.
 		 */
+#if 1
+		inline derived_t& notify_all_events()
+		{
+			derived_t& derive = static_cast<derived_t&>(*this);
+
+			// Make sure we run on the strand
+			asio::dispatch(derive.io(), make_allocator(derive.wallocator(),
+				[this, this_ptr = derive.selfptr()]() mutable
+			{
+				this->notify_all_events();
+			}));
+			return (derive);
+		}
+#else
 		inline derived_t& notify_all_events()
 		{
 			derived_t& derive = static_cast<derived_t&>(*this);
@@ -149,7 +163,7 @@ namespace asio2::detail
 			// Make sure we run on the strand
 			if (!derive.io().strand().running_in_this_thread())
 			{
-				asio::post(derive.io().strand(), make_allocator(derive.wallocator(),
+				asio::post(derive.io(), make_allocator(derive.wallocator(),
 					[this, this_ptr = derive.selfptr()]() mutable
 				{
 					this->notify_all_events();
@@ -165,7 +179,7 @@ namespace asio2::detail
 
 			return (derive);
 		}
-
+#endif
 	protected:
 		/// Used to exit the async_event when component is ready to stop.
 		/// if user don't notify the event to execute, the io_context will

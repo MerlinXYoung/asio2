@@ -146,9 +146,20 @@ namespace asio2::detail
 		/**
 		 * @function : start session
 		 */
+#if 1
 		inline void start()
 		{
-			if (!this->io_.strand().running_in_this_thread())
+			this->derived().dispatch([this, this_ptr = this->derived().selfptr()]() mutable
+			{
+				// start the timer of check connect timeout
+				this->derived()._post_connect_timeout_timer(
+				this->connect_timeout_, this->derived().selfptr());
+			});
+		}
+#else
+		inline void start()
+		{
+			if (!this->io_.running_in_this_thread())
 			{
 				this->derived().post([this, this_ptr = this->derived().selfptr()]() mutable
 				{
@@ -161,16 +172,47 @@ namespace asio2::detail
 			this->derived()._post_connect_timeout_timer(
 				this->connect_timeout_, this->derived().selfptr());
 		}
-
+#endif
 	public:
 		/**
 		 * @function : stop session
 		 * note : this function must be noblocking,if it's blocking,
 		 *        will cause circle lock in session_mgr::stop function
 		 */
+#if 1
 		inline void stop()
 		{
-			if (!this->io_.strand().running_in_this_thread())
+
+			this->derived().dispatch([this, this_ptr = this->derived().selfptr()]() mutable{
+				// close silence timer
+				this->_stop_silence_timer();
+
+				// close connect timeout timer
+				this->_stop_connect_timeout_timer(asio::error::operation_aborted);
+
+				// close user custom timers
+				this->stop_all_timers();
+
+				// close all posted timed tasks
+				this->stop_all_timed_tasks();
+
+				// close all async_events
+				this->notify_all_events();
+
+				// destroy user data, maybe the user data is self shared_ptr, 
+				// if don't destroy it, will cause loop refrence.
+				this->user_data_.reset();
+
+				// destroy the counter
+				this->counter_ptr_.reset();
+			});
+
+			
+		}
+#else
+		inline void stop()
+		{
+			if (!this->io_.running_in_this_thread())
 			{
 				this->derived().post([this, this_ptr = this->derived().selfptr()]() mutable
 				{
@@ -201,7 +243,7 @@ namespace asio2::detail
 			// destroy the counter
 			this->counter_ptr_.reset();
 		}
-
+#endif
 		/**
 		 * @function : check whether the session is started
 		 */

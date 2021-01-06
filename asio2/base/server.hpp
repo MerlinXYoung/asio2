@@ -99,9 +99,28 @@ namespace asio2::detail
 		/**
 		 * @function : stop the server
 		 */
+#if 1
 		inline void stop()
 		{
-			if (!this->io_.strand().running_in_this_thread())
+			this->derived().dispatch([this, this_ptr = this->derived().selfptr()]() mutable {
+				// close user custom timers
+				this->stop_all_timers();
+
+				// close all posted timed tasks
+				this->stop_all_timed_tasks();
+
+				// close all async_events
+				this->notify_all_events();
+
+				// destroy user data, maybe the user data is self shared_ptr, 
+				// if don't destroy it, will cause loop refrence.
+				this->user_data_.reset();
+			});
+		}
+#else
+		inline void stop()
+		{
+			if (!this->io_.running_in_this_thread())
 			{
 				this->derived().post([this, this_ptr = this->derived().selfptr()]() mutable
 				{
@@ -123,7 +142,7 @@ namespace asio2::detail
 			// if don't destroy it, will cause loop refrence.
 			this->user_data_.reset();
 		}
-
+#endif
 		/**
 		 * @function : check whether the server is started 
 		 */

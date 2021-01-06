@@ -110,7 +110,7 @@ namespace asio2::detail
 					auto ex = [&derive, result, id, pm = std::move(promise)]
 					(error_code ec, std::string_view s) mutable
 					{
-						ASIO2_ASSERT(derive.io().strand().running_in_this_thread());
+						// ASIO2_ASSERT(derive.io().strand().running_in_this_thread());
 
 						if (!ec)
 						{
@@ -138,7 +138,7 @@ namespace asio2::detail
 					};
 
 					// Make sure we not run on the strand
-					if (!derive.io().strand().running_in_this_thread())
+					// if (!derive.io().strand().running_in_this_thread())
 					{
 						derive.post([&derive, p = derive.selfptr(),
 							req = std::move(req), ex = std::move(ex)]() mutable
@@ -167,6 +167,7 @@ namespace asio2::detail
 							});
 						}
 					}
+					#if 0
 					else
 					{
 						// Unable to invoke synchronization rpc call function in communication thread
@@ -182,7 +183,7 @@ namespace asio2::detail
 						//	auto t1 = std::chrono::steady_clock::now();
 						//	for (auto elapsed = t1 - t1; elapsed < timeout; elapsed = std::chrono::steady_clock::now() - t1)
 						//	{
-						//		derive.io().context().run_for(timeout - elapsed);
+						//		derive.io().run_for(timeout - elapsed);
 						//		status = future.wait_for(std::chrono::nanoseconds(0));
 						//		if (status == std::future_status::ready)
 						//		{
@@ -198,6 +199,7 @@ namespace asio2::detail
 						//	ec = get_last_error();
 						//}
 					}
+					#endif
 				}
 				catch (cereal::exception&  ) { ec = asio::error::no_data; }
 				catch (system_error     & e) { ec = e.code(); }
@@ -361,12 +363,12 @@ namespace asio2::detail
 				// otherwise the "derive.send" maybe has't called, the "timer->async_wait" has called
 				// already.
 				std::shared_ptr<asio::steady_timer> timer =
-					std::make_shared<asio::steady_timer>(derive.io().context());
+					std::make_shared<asio::steady_timer>(derive.io());
 
 				auto ex = [&derive, id, timer, cb = std::forward<Callback>(cb)]
 				(error_code ec, std::string_view s) mutable
 				{
-					ASIO2_ASSERT(derive.io().strand().running_in_this_thread());
+					// ASIO2_ASSERT(derive.io().strand().running_in_this_thread());
 
 					timer->cancel(ec_ignore);
 
@@ -388,7 +390,7 @@ namespace asio2::detail
 							derive.reqs_.emplace(req.id(), std::move(ex));
 
 							timer->expires_after(timeout);
-							timer->async_wait(asio::bind_executor(derive.io().strand(),
+							timer->async_wait(asio::bind_executor(derive.io(),
 								[&derive, this_ptr, id = req.id()](const error_code & ec) mutable
 							{
 								if (ec == asio::error::operation_aborted)

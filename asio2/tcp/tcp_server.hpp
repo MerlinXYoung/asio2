@@ -46,9 +46,9 @@ namespace asio2::detail
 			std::size_t concurrency      = std::thread::hardware_concurrency() * 2
 		)
 			: super(concurrency)
-			, acceptor_        (this->io_.context())
-			, acceptor_timer_  (this->io_.context())
-			, counter_timer_   (this->io_.context())
+			, acceptor_        (this->io_)
+			, acceptor_timer_  (this->io_)
+			, counter_timer_   (this->io_)
 			, init_buffer_size_(init_buffer_size)
 			, max_buffer_size_ (max_buffer_size)
 		{
@@ -374,7 +374,7 @@ namespace asio2::detail
 				std::string p = to_string(std::forward<StrOrInt>(service));
 
 				// parse address and port
-				asio::ip::tcp::resolver resolver(this->io_.context());
+				asio::ip::tcp::resolver resolver(this->io_);
 				asio::ip::tcp::endpoint endpoint = *resolver.resolve(h, p,
 					asio::ip::resolver_base::flags::passive |
 					asio::ip::resolver_base::flags::address_configured).begin();
@@ -471,7 +471,7 @@ namespace asio2::detail
 				// start timer to hold the acceptor io_context
 				this->counter_timer_.expires_after((std::chrono::nanoseconds::max)());
 				this->counter_timer_.async_wait(asio::bind_executor(
-					this->io_.strand(), [](const error_code&) {}));
+					this->io_, [](const error_code&) {}));
 
 				// stop all the sessions, the session::stop must be no blocking,
 				// otherwise it may be cause loop lock.
@@ -522,7 +522,7 @@ namespace asio2::detail
 				std::shared_ptr<session_t> session_ptr = this->derived()._make_session();
 
 				auto& socket = session_ptr->socket().lowest_layer();
-				this->acceptor_.async_accept(socket, asio::bind_executor(this->io_.strand(),
+				this->acceptor_.async_accept(socket, asio::bind_executor(this->io_,
 					make_allocator(this->rallocator_,
 						[this, sptr = std::move(session_ptr), condition]
 				(const error_code& ec) mutable
@@ -536,13 +536,13 @@ namespace asio2::detail
 				set_last_error(e);
 
 				this->acceptor_timer_.expires_after(std::chrono::seconds(1));
-				this->acceptor_timer_.async_wait(asio::bind_executor(this->io_.strand(),
+				this->acceptor_timer_.async_wait(asio::bind_executor(this->io_,
 					make_allocator(this->rallocator_, [this, condition]
 					(const error_code& ec) mutable
 				{
 					set_last_error(ec);
 					if (ec) return;
-					asio::post(this->io_.strand(), make_allocator(this->rallocator_,
+					asio::post(this->io_, make_allocator(this->rallocator_,
 						[this, condition]() mutable
 					{
 						this->derived()._post_accept(std::move(condition));

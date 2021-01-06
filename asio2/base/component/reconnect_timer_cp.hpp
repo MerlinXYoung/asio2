@@ -31,7 +31,7 @@ namespace asio2::detail
 		 * @constructor
 		 */
 		explicit reconnect_timer_cp(io_t & io)
-			: reconnect_timer_(io.context())
+			: reconnect_timer_(io)
 		{
 			this->reconnect_timer_canceled_.clear();
 			this->reconnect_is_running_.clear();
@@ -104,7 +104,7 @@ namespace asio2::detail
 			derived_t& derive = static_cast<derived_t&>(*this);
 
 			this->reconnect_timer_.expires_after(delay);
-			this->reconnect_timer_.async_wait(asio::bind_executor(derive.io().strand(),
+			this->reconnect_timer_.async_wait(asio::bind_executor(derive.io(),
 				[&derive, self_ptr = std::move(this_ptr), f = std::forward<Callback>(f)]
 			(const error_code & ec) mutable
 			{

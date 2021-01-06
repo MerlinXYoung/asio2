@@ -25,20 +25,20 @@
 
 namespace asio2::detail
 {
-	class io_t
-	{
-	public:
-		io_t() : context_(1), strand_(context_) {}
-		~io_t() = default;
+	// class io_t
+	// {
+	// public:
+	// 	io_t() : context_(1), strand_(context_) {}
+	// 	~io_t() = default;
 
-		inline asio::io_context & context() { return this->context_; }
-		inline asio::io_context::strand &  strand() { return this->strand_; }
+	// 	inline asio::io_context & context() { return this->context_; }
+	// 	inline asio::io_context::strand &  strand() { return this->strand_; }
 
-	protected:
-		asio::io_context context_;
-		asio::io_context::strand strand_;
-	};
-
+	// protected:
+	// 	asio::io_context context_;
+	// 	asio::io_context::strand strand_;
+	// };
+	using io_t = asio::io_context;
 	/**
 	 * io_context pool
 	 */
@@ -91,14 +91,14 @@ namespace asio2::detail
 				 * This function must not be called while there are any unfinished calls to
 				 * the run(), run_one(), poll() or poll_one() functions.
 				 */
-				io.context().restart();
+				io.restart();
 
-				this->works_.emplace_back(io.context().get_executor());
+				this->works_.emplace_back(io.get_executor());
 
 				// start work thread
 				this->threads_.emplace_back([&io]()
 				{
-					io.context().run();
+					io.run();
 				});
 			}
 
@@ -180,7 +180,7 @@ namespace asio2::detail
 		/**
 		 * @function : get an io_context to use
 		 */
-		inline io_t & get(std::size_t index = static_cast<std::size_t>(-1))
+		inline asio::io_context & get(std::size_t index = static_cast<std::size_t>(-1))
 		{
 			// Use a round-robin scheme to choose the next io_context to use. 
 			return this->ios_[index < this->ios_.size() ? index : ((++(this->next_)) % this->ios_.size())];
@@ -223,7 +223,7 @@ namespace asio2::detail
 			if (!this->ios_.empty())
 			{
 				auto t1 = std::chrono::steady_clock::now();
-				asio::io_context & ioc = this->ios_.front().context();
+				asio::io_context & ioc = this->ios_.front();
 				while (!ioc.stopped())
 				{
 					auto t2 = std::chrono::steady_clock::now();
@@ -245,7 +245,7 @@ namespace asio2::detail
 			for (std::size_t i = 1; i < this->ios_.size(); ++i)
 			{
 				auto t1 = std::chrono::steady_clock::now();
-				asio::io_context & ioc = this->ios_[i].context();
+				asio::io_context & ioc = this->ios_[i];
 				while (!ioc.stopped())
 				{
 					auto t2 = std::chrono::steady_clock::now();
@@ -261,7 +261,7 @@ namespace asio2::detail
 		std::vector<std::thread>       threads_;
 
 		/// The pool of io_context. 
-		std::vector<io_t>              ios_;
+		std::vector<asio::io_context>              ios_;
 
 		/// 
 		std::mutex                     mutex_;

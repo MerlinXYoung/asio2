@@ -114,7 +114,7 @@ namespace asio2::detail
 		inline void _handle_connect(const error_code& ec, std::shared_ptr<derived_t> this_ptr,
 			condition_wrap<MatchCondition> condition)
 		{
-			asio::post(this->io_.strand(), make_allocator(this->rallocator_,
+			asio::post(this->io_, make_allocator(this->rallocator_,
 				[this, self_ptr = std::move(this_ptr), condition = std::move(condition)]() mutable
 			{
 				this->derived()._ws_start(self_ptr, condition, this->socket_);

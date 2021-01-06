@@ -118,13 +118,13 @@ namespace asio2::detail
 			, user_timer_cp  <derived_t, args_t>()
 			, post_cp        <derived_t, args_t>()
 			, async_event_cp <derived_t, args_t>()
-			, socket_    (iopool_.get(0).context())
+			, socket_    (iopool_.get(0))
 			, rallocator_()
 			, wallocator_()
 			, listener_  ()
 			, io_        (iopool_.get(0))
 			, buffer_    (init_buffer_size, max_buffer_size)
-			, timer_     (iopool_.get(0).context())
+			, timer_     (iopool_.get(0))
 			, ncount_    (send_count)
 		{
 		}
@@ -542,7 +542,7 @@ namespace asio2::detail
 #else
 				this->identifier_ = static_cast<unsigned short>(::getpid());
 #endif
-				asio::ip::icmp::resolver resolver(this->io_.context());
+				asio::ip::icmp::resolver resolver(this->io_);
 				this->destination_ = *resolver.resolve(host, "").begin();
 
 				this->socket_.close(ec_ignore);
@@ -582,7 +582,7 @@ namespace asio2::detail
 
 				asio::detail::throw_error(ec);
 
-				asio::post(this->io_.strand(), [this]()
+				asio::post(this->io_, [this]()
 				{
 					this->buffer_.consume(this->buffer_.size());
 					this->derived()._post_send();
@@ -615,7 +615,7 @@ namespace asio2::detail
 			// must care for operate the socket.when need close the 
 			// socket ,we use the strand to post a event,make sure the
 			// socket's close operation is in the same thread.
-			asio::post(this->io_.strand(), [this, ec, this_ptr = std::move(self_ptr), old_state]()
+			asio::post(this->io_, [this, ec, this_ptr = std::move(self_ptr), old_state]()
 			{
 				detail::ignore_unused(old_state);
 
@@ -695,7 +695,7 @@ namespace asio2::detail
 			// Wait up to five seconds for a reply.
 			this->replies_ = 0;
 			this->timer_.expires_after(this->timeout_);
-			this->timer_.async_wait(asio::bind_executor(this->io_.strand(),
+			this->timer_.async_wait(asio::bind_executor(this->io_,
 				make_allocator(this->wallocator_,
 					std::bind(&self::_handle_timer, this, std::placeholders::_1))));
 		}
@@ -715,7 +715,7 @@ namespace asio2::detail
 			if (this->is_started())
 			{
 				this->timer_.expires_after(this->interval_);
-				this->timer_.async_wait(asio::bind_executor(this->io_.strand(),
+				this->timer_.async_wait(asio::bind_executor(this->io_,
 					make_allocator(this->wallocator_,
 						std::bind(&self::_post_send, this))));
 			}
@@ -729,7 +729,7 @@ namespace asio2::detail
 			{
 				// Wait for a reply. We prepare the buffer to receive up to 64KB.
 				this->socket_.async_receive(this->buffer_.prepare(this->buffer_.pre_size()),
-					asio::bind_executor(this->io_.strand(), make_allocator(this->rallocator_,
+					asio::bind_executor(this->io_, make_allocator(this->rallocator_,
 						std::bind(&self::_handle_recv, this,
 							std::placeholders::_1, std::placeholders::_2))));
 			}

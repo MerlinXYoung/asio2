@@ -15,7 +15,11 @@
 #pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <filesystem>
+// #include <filesystem>
+#include <experimental/filesystem>
+namespace std{
+	using namespace experimental;
+}
 
 #include <asio2/base/component/user_data_cp.hpp>
 
@@ -63,6 +67,7 @@ namespace asio2::detail
 		ASIO2_CLASS_FRIEND_DECLARE_TCP_CLIENT;
 		ASIO2_CLASS_FRIEND_DECLARE_TCP_SESSION;
 
+		
 	public:
 		using self = http_response_impl_t<isRequest, Body, Fields>;
 		using super = http::message<isRequest, Body, Fields>;

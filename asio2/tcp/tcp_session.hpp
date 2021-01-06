@@ -73,7 +73,7 @@ namespace asio2::detail
 			std::size_t                init_buffer_size,
 			std::size_t                max_buffer_size
 		)
-			: super(sessions, listener, rwio, init_buffer_size, max_buffer_size, rwio.context())
+			: super(sessions, listener, rwio, init_buffer_size, max_buffer_size, rwio)
 			, tcp_keepalive_cp<derived_t, args_t>(this->socket_)
 			, tcp_send_op<derived_t, args_t>()
 			, tcp_recv_op<derived_t, args_t>()
@@ -223,7 +223,7 @@ namespace asio2::detail
 		{
 			// to avlid the user call stop in another thread,then it may be socket_.async_read_some
 			// and socket_.close be called at the same time
-			asio::post(this->io_.strand(), make_allocator(this->rallocator_,
+			asio::post(this->io_, make_allocator(this->rallocator_,
 				[this, self_ptr = std::move(this_ptr), condition = std::move(condition)]() mutable
 			{
 				if constexpr (!std::is_same_v<MatchCondition, asio2::detail::hook_buffer_t>)

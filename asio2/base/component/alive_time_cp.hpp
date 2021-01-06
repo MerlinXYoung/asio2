@@ -26,7 +26,7 @@ namespace asio2::detail
 		/**
 		 * @constructor
 		 */
-		alive_time_cp() {}
+		alive_time_cp() =default;
 
 		/**
 		 * @destructor

@@ -46,7 +46,7 @@ namespace asio2::detail
 			std::size_t max_buffer_size = (std::numeric_limits<std::size_t>::max)()
 		)
 			: super(1)
-			, acceptor_(this->io_.context())
+			, acceptor_(this->io_)
 			, remote_endpoint_()
 			, buffer_(init_buffer_size, max_buffer_size)
 		{
@@ -392,7 +392,7 @@ namespace asio2::detail
 				std::string p = to_string(std::forward<StrOrInt>(service));
 
 				// parse address and port
-				asio::ip::udp::resolver resolver(this->io_.context());
+				asio::ip::udp::resolver resolver(this->io_);
 				asio::ip::udp::endpoint endpoint = *resolver.resolve(h, p,
 					asio::ip::resolver_base::flags::passive |
 					asio::ip::resolver_base::flags::address_configured).begin();
@@ -535,7 +535,7 @@ namespace asio2::detail
 			{
 				this->acceptor_.async_receive_from(
 					this->buffer_.prepare(this->buffer_.pre_size()), this->remote_endpoint_,
-					asio::bind_executor(this->io_.strand(), make_allocator(this->rallocator_,
+					asio::bind_executor(this->io_, make_allocator(this->rallocator_,
 						[this, condition = std::move(condition)]
 				(const error_code& ec, std::size_t bytes_recvd) mutable
 				{

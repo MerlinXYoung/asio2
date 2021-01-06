@@ -175,14 +175,15 @@ namespace asio2::detail
 
 					derive._post_resolve(std::move(this_ptr), std::move(condition));
 
-					if (!derive.io().strand().running_in_this_thread())
-					{
-						set_last_error(future.get());
-					}
-					else
-					{
-						ASIO2_ASSERT(false);
-					}
+					// if (!derive.io().strand().running_in_this_thread())
+					// {
+					// 	set_last_error(future.get());
+					// }
+					// else
+					// {
+					// 	ASIO2_ASSERT(false);
+					// }
+					set_last_error(future.get());
 
 					return derive.is_started();
 				}
@@ -207,14 +208,14 @@ namespace asio2::detail
 			{
 				// resolve the server address.
 				std::unique_ptr<resolver_type> resolver_ptr = std::make_unique<resolver_type>(
-					derive.io().context());
+					derive.io());
 
 				resolver_type* resolver_rptr = resolver_ptr.get();
 
 				// Before async_resolve execution is complete, we must hold the resolver object.
 				// so we captured the resolver_ptr into the lambda callback function.
 				resolver_rptr->async_resolve(this->host_, this->port_,
-					asio::bind_executor(derive.io().strand(),
+					asio::bind_executor(derive.io(),
 						[this, &derive, this_ptr = std::move(this_ptr), condition = std::move(condition),
 						resolver_ptr = std::move(resolver_ptr)]
 				(const error_code& ec, const endpoints_type& endpoints) mutable
@@ -252,7 +253,7 @@ namespace asio2::detail
 
 				// Start the asynchronous connect operation.
 				derive.socket().lowest_layer().async_connect(iter->endpoint(),
-					asio::bind_executor(derive.io().strand(), make_allocator(derive.rallocator(),
+					asio::bind_executor(derive.io(), make_allocator(derive.rallocator(),
 						[&derive, iter, this_ptr, condition](const error_code & ec) mutable
 				{
 					set_last_error(ec);

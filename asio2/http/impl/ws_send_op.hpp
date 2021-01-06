@@ -46,7 +46,7 @@ namespace asio2::detail
 			derived_t& derive = static_cast<derived_t&>(*this);
 
 			derive.ws_stream().async_write(asio::buffer(data),
-				asio::bind_executor(derive.io().strand(), make_allocator(derive.wallocator(),
+				asio::bind_executor(derive.io(), make_allocator(derive.wallocator(),
 					[&derive, p = derive.selfptr(), callback = std::forward<Callback>(callback)]
 			(const error_code& ec, std::size_t bytes_sent) mutable
 			{
@@ -75,7 +75,7 @@ namespace asio2::detail
 
 			auto buffer = asio::buffer(*str);
 
-			derive.ws_stream().async_write(buffer, asio::bind_executor(derive.io().strand(),
+			derive.ws_stream().async_write(buffer, asio::bind_executor(derive.io(),
 				make_allocator(derive.wallocator(), [&derive, p = derive.selfptr(),
 					str = std::move(str), callback = std::forward<Callback>(callback)]
 					(const error_code& ec, std::size_t bytes_sent) mutable

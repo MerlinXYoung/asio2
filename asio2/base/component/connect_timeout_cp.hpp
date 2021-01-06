@@ -31,7 +31,7 @@ namespace asio2::detail
 		 * @constructor
 		 */
 		explicit connect_timeout_cp(io_t & io)
-			: connect_timeout_timer_(io.context())
+			: connect_timeout_timer_(io)
 		{
 			this->connect_timer_canceled_.clear();
 		}
@@ -68,7 +68,7 @@ namespace asio2::detail
 
 			this->connect_timeout_timer_.expires_after(duration);
 			this->connect_timeout_timer_.async_wait(
-				asio::bind_executor(derive.io().strand(),
+				asio::bind_executor(derive.io(),
 					[&derive, self_ptr = std::move(this_ptr)](const error_code& ec) mutable
 			{
 				// bug fixed : 
@@ -122,7 +122,7 @@ namespace asio2::detail
 
 			this->connect_timeout_timer_.expires_after(duration);
 			this->connect_timeout_timer_.async_wait(
-				asio::bind_executor(derive.io().strand(),
+				asio::bind_executor(derive.io(),
 					[this, self_ptr = std::move(this_ptr), f = std::forward<Fn>(fn)]
 			(const error_code& ec) mutable
 			{

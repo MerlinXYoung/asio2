@@ -28,7 +28,7 @@ namespace asio2::detail
 		/**
 		 * @constructor
 		 */
-		user_data_cp() {}
+		user_data_cp() = default;
 
 		/**
 		 * @destructor

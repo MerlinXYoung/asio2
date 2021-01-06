@@ -20,6 +20,7 @@
 #include <asio2/base/error.hpp>
 #include <asio2/base/listener.hpp>
 #include <asio2/base/session_mgr.hpp>
+#include <asio2/base/define.hpp>
 
 #include <asio2/base/detail/object.hpp>
 #include <asio2/base/detail/allocator.hpp>

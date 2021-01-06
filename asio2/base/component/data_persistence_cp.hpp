@@ -42,7 +42,7 @@ namespace asio2::detail
 		/**
 		 * @constructor
 		 */
-		data_persistence_cp() {}
+		data_persistence_cp() = default;
 
 		/**
 		 * @destructor

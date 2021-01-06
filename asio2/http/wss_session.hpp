@@ -18,6 +18,7 @@
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
 #include <asio2/tcp/tcps_session.hpp>
+#include <asio2/http/ws_session.hpp>
 #include <asio2/http/component/ws_stream_cp.hpp>
 #include <asio2/http/impl/ws_send_op.hpp>
 

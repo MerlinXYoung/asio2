@@ -33,8 +33,8 @@ namespace asio2::detail
 		explicit reconnect_timer_cp(io_t & io)
 			: reconnect_timer_(io)
 		{
-			this->reconnect_timer_canceled_.clear();
-			this->reconnect_is_running_.clear();
+			// this->reconnect_timer_canceled_.clear();
+			// this->reconnect_is_running_.clear();
 		}
 
 		/**
@@ -173,7 +173,7 @@ namespace asio2::detail
 		asio::steady_timer                          reconnect_timer_;
 
 		/// 
-		std::atomic_flag                            reconnect_timer_canceled_;
+		std::atomic_flag                            reconnect_timer_canceled_{ATOMIC_FLAG_INIT};
 
 		/// if there has no data transfer for a long time,the session will be disconnect
 		std::chrono::steady_clock::duration         reconnect_delay_           = std::chrono::seconds(1);
@@ -182,7 +182,7 @@ namespace asio2::detail
 		bool                                        reconnect_enable_          = true;
 
 		/// Used to chech whether the reconnect timer has started already
-		std::atomic_flag                            reconnect_is_running_;
+		std::atomic_flag                            reconnect_is_running_{ATOMIC_FLAG_INIT};
 	};
 }
 

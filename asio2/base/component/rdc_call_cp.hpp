@@ -54,7 +54,7 @@ namespace asio2::detail
 		/**
 		 * @constructor
 		 */
-		rdc_call_cp_impl() {}
+		rdc_call_cp_impl() = default;
 
 		/**
 		 * @destructor

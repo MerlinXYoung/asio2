@@ -2,7 +2,9 @@
 // the /usr/local/include directory first, and copy the "libcrypto.a,libssl.a" files to 
 // /usr/local/lib directory first. "libcrypto.a,libssl.a" is in "asio2/lib/x64".
 
-#include <asio2/asio2.hpp>
+#include <asio2/base/detail/condition_wrap.hpp>
+#include <asio2/udp/component/kcp_stream_cp.hpp>
+#include <asio2/udp/udp_server.hpp>
 
 int main()
 {

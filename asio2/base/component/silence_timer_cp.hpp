@@ -33,7 +33,7 @@ namespace asio2::detail
 		explicit silence_timer_cp(io_t & io)
 			: silence_timer_(io)
 		{
-			this->silence_timer_canceled_.clear();
+			// this->silence_timer_canceled_.clear();
 		}
 
 		/**
@@ -116,7 +116,7 @@ namespace asio2::detail
 		asio::steady_timer                          silence_timer_;
 
 		/// 
-		std::atomic_flag                            silence_timer_canceled_;
+		std::atomic_flag                            silence_timer_canceled_{ATOMIC_FLAG_INIT};
 
 		/// if there has no data transfer for a long time,the session will be disconnect
 		std::chrono::steady_clock::duration         silence_timeout_ = std::chrono::minutes(60);

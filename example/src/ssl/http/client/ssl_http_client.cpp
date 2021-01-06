@@ -5,8 +5,8 @@
 #ifndef ASIO2_USE_SSL
 #define ASIO2_USE_SSL
 #endif
-
-#include <asio2/asio2.hpp>
+#include <iostream>
+#include <asio2/http/https_client.hpp>
 
 int main()
 {

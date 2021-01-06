@@ -22,6 +22,8 @@
 #include <memory>
 
 #include <asio2/base/detail/rdc_invoker.hpp>
+#include <asio2/base/detail/util.hpp>
+
 
 namespace asio2::detail
 {

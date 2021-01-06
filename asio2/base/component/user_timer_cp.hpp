@@ -156,12 +156,12 @@ namespace asio2::detail
 		/**
 		 * @constructor
 		 */
-		user_timer_cp() {}
+		user_timer_cp() = default;
 
 		/**
 		 * @destructor
 		 */
-		~user_timer_cp() {}
+		~user_timer_cp() = default;
 
 	public:
 		template<class TimerId, class Rep, class Period, class Fun, class... Args>

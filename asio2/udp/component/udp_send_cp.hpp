@@ -28,10 +28,12 @@
 #include <asio2/base/selector.hpp>
 #include <asio2/base/iopool.hpp>
 #include <asio2/base/error.hpp>
+#include <asio2/base/define.hpp>
 
 #include <asio2/base/detail/util.hpp>
 #include <asio2/base/detail/function_traits.hpp>
 #include <asio2/base/detail/buffer_wrap.hpp>
+
 
 #include <asio2/base/component/data_persistence_cp.hpp>
 

@@ -36,6 +36,8 @@
 #include <asio2/base/detail/object.hpp>
 #include <asio2/base/detail/allocator.hpp>
 #include <asio2/base/detail/util.hpp>
+#include <asio2/base/detail/condition_wrap.hpp>
+#include <asio2/base/detail/buffer_wrap.hpp>
 
 #include <asio2/base/component/user_data_cp.hpp>
 #include <asio2/base/component/socket_cp.hpp>

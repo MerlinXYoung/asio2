@@ -6,7 +6,7 @@
 #define ASIO2_USE_SSL
 #endif
 
-#include <asio2/asio2.hpp>
+#include <asio2/rpc/rpc_client.hpp>
 
 class user
 {

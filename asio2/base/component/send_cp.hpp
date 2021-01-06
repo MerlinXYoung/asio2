@@ -49,7 +49,7 @@ namespace asio2::detail
 		/**
 		 * @constructor
 		 */
-		send_cp() {}
+		send_cp() = default;
 
 		/**
 		 * @destructor

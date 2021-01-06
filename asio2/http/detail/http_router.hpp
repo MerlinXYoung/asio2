@@ -31,7 +31,9 @@
 #include <type_traits>
 // #include <filesystem>
 #include <experimental/filesystem>
-
+namespace std{
+	using namespace experimental;
+}
 #include <asio2/base/selector.hpp>
 #include <asio2/base/iopool.hpp>
 #include <asio2/base/error.hpp>

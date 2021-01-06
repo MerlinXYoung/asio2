@@ -33,7 +33,7 @@ namespace asio2::detail
 		explicit connect_timeout_cp(io_t & io)
 			: connect_timeout_timer_(io)
 		{
-			this->connect_timer_canceled_.clear();
+			// this->connect_timer_canceled_.clear();
 		}
 
 		/**
@@ -162,7 +162,7 @@ namespace asio2::detail
 	protected:
 		asio::steady_timer                          connect_timeout_timer_;
 
-		std::atomic_flag                            connect_timer_canceled_;
+		std::atomic_flag                            connect_timer_canceled_{ATOMIC_FLAG_INIT};
 
 		std::chrono::steady_clock::duration         connect_timeout_         = std::chrono::seconds(5);
 

@@ -1,8 +1,8 @@
 // When compiling with vs under linux, you need to copy the "asio,beast,ceral,fmt" folders to
 // the /usr/local/include directory first, and copy the "libcrypto.a,libssl.a" files to 
 // /usr/local/lib directory first. "libcrypto.a,libssl.a" is in "asio2/lib/x64".
-
-#include <asio2/asio2.hpp>
+#include <iostream>
+#include <asio2/tcp/tcp_client.hpp>
 
 void on_recv(std::string_view sv)
 {

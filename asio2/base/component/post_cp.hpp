@@ -32,7 +32,7 @@ namespace asio2::detail
 		/**
 		 * @constructor
 		 */
-		post_cp() {}
+		post_cp() = default;
 
 		/**
 		 * @destructor

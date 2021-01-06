@@ -26,7 +26,7 @@ namespace asio2::detail
 		/**
 		 * @constructor
 		 */
-		connect_time_cp() {}
+		connect_time_cp() = default;
 
 		/**
 		 * @destructor

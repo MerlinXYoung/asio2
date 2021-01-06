@@ -2,12 +2,15 @@
 // the /usr/local/include directory first, and copy the "libcrypto.a,libssl.a" files to 
 // /usr/local/lib directory first. "libcrypto.a,libssl.a" is in "asio2/lib/x64".
 
+#include <iostream>
 // #include <filesystem>
 #include <experimental/filesystem>
 namespace std{
 	using namespace experimental;
 }
-#include <asio2/asio2.hpp>
+#include <asio2/http/http_server.hpp>
+#include <asio2/http/http_client.hpp>
+
 
 struct aop_log
 {

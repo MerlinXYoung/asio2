@@ -79,7 +79,7 @@ namespace asio2::detail
 		/**
 		 * @constructor
 		 */
-		event_queue_cp() {}
+		event_queue_cp() = default;
 
 		/**
 		 * @destructor

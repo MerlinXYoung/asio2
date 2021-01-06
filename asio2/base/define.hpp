@@ -35,7 +35,7 @@
 	template <class, class>                      KEYWORD socket_cp;                 \
 	template <class, class>                      KEYWORD user_data_cp;              \
 	template <class, class>                      KEYWORD user_timer_cp;             \
-	template <class       >                      KEYWORD session_mgr_t;             \
+	template <class       >                      KEYWORD session_mgr_t
 
 
 #define ASIO2_CLASS_DECLARE_TCP_BASE(KEYWORD)                                       \
@@ -52,7 +52,7 @@
 	template <class, class>                      KEYWORD rpc_call_cp;               \
 	template <class, class>                      KEYWORD rpc_recv_op;               \
 	template <class       >                      KEYWORD http_router_t;             \
-	template <class       >                      KEYWORD rpc_invoker_t;             \
+	template <class       >                      KEYWORD rpc_invoker_t
 
 
 #define ASIO2_CLASS_DECLARE_TCP_CLIENT(KEYWORD)                                     \
@@ -63,7 +63,7 @@
 	template <class, class>                      KEYWORD https_client_impl_t;       \
 	template <class, class>                      KEYWORD ws_client_impl_t;          \
 	template <class, class>                      KEYWORD wss_client_impl_t;         \
-	template <class, class>                      KEYWORD rpc_client_impl_t;         \
+	template <class, class>                      KEYWORD rpc_client_impl_t
 
 
 #define ASIO2_CLASS_DECLARE_TCP_SERVER(KEYWORD)                                     \
@@ -74,7 +74,7 @@
 	template <class, class>                      KEYWORD https_server_impl_t;       \
 	template <class, class>                      KEYWORD ws_server_impl_t;          \
 	template <class, class>                      KEYWORD wss_server_impl_t;         \
-	template <class, class>                      KEYWORD rpc_server_impl_t;         \
+	template <class, class>                      KEYWORD rpc_server_impl_t
 
 
 #define ASIO2_CLASS_DECLARE_TCP_SESSION(KEYWORD)                                    \
@@ -85,28 +85,28 @@
 	template <class, class>                      KEYWORD https_session_impl_t;      \
 	template <class, class>                      KEYWORD ws_session_impl_t;         \
 	template <class, class>                      KEYWORD wss_session_impl_t;        \
-	template <class, class>                      KEYWORD rpc_session_impl_t;        \
+	template <class, class>                      KEYWORD rpc_session_impl_t
 
 
 #define ASIO2_CLASS_DECLARE_UDP_BASE(KEYWORD)                                       \
 	template <class, class>                      KEYWORD kcp_stream_cp;             \
 	template <class, class>                      KEYWORD udp_send_cp;               \
-	template <class, class>                      KEYWORD udp_send_op;               \
+	template <class, class>                      KEYWORD udp_send_op
 
 
 #define ASIO2_CLASS_DECLARE_UDP_CLIENT(KEYWORD)                                     \
 	template <class, class>                      KEYWORD client_impl_t;             \
-	template <class, class>                      KEYWORD udp_client_impl_t;         \
+	template <class, class>                      KEYWORD udp_client_impl_t
 
 
 #define ASIO2_CLASS_DECLARE_UDP_SERVER(KEYWORD)                                     \
 	template <class, class>                      KEYWORD server_impl_t;             \
-	template <class, class>                      KEYWORD udp_server_impl_t;         \
+	template <class, class>                      KEYWORD udp_server_impl_t
 
 
 #define ASIO2_CLASS_DECLARE_UDP_SESSION(KEYWORD)                                    \
 	template <class, class>                      KEYWORD session_impl_t;            \
-	template <class, class>                      KEYWORD udp_session_impl_t;        \
+	template <class, class>                      KEYWORD udp_session_impl_t
 
 
 //-------------------------------------------------------------------------------------------------

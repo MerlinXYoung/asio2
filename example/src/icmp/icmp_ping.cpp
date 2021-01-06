@@ -70,7 +70,7 @@ public:
 
 		ping.stop();
 
-		printf("loss rate : %.0lf%% average time : %lldms\n", ping.plp(),
+		printf("loss rate : %.0lf%% average time : %" PRIu64 "ms\n", ping.plp(),
 			std::chrono::duration_cast<std::chrono::milliseconds>(ping.avg_lag()).count());
 	}
 };

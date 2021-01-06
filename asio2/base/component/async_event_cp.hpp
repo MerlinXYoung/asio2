@@ -151,7 +151,11 @@ namespace asio2::detail
 			asio::dispatch(derive.io(), make_allocator(derive.wallocator(),
 				[this, this_ptr = derive.selfptr()]() mutable
 			{
-				this->notify_all_events();
+				for (auto&[key, event_ptr] : this->async_events_)
+				{
+					asio2::detail::ignore_unused(key);
+					event_ptr->notify();
+				}
 			}));
 			return (derive);
 		}

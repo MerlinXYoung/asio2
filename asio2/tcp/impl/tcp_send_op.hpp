@@ -93,13 +93,14 @@ namespace asio2::detail
 				bytes = 3;
 				head = std::make_unique<std::uint8_t[]>(bytes);
 				head[0] = static_cast<std::uint8_t>(254);
-				std::uint16_t size = static_cast<std::uint16_t>(buffer.size());
+				std::uint16_t size = hton(static_cast<std::uint16_t>(buffer.size()));
 				std::memcpy(&head[1], reinterpret_cast<const void*>(&size), sizeof(std::uint16_t));
 				// use little endian
-				if (!is_little_endian())
-				{
-					swap_bytes<sizeof(std::uint16_t)>(&head[1]);
-				}
+				// if (!is_little_endian())
+				// {
+				// 	swap_bytes<sizeof(std::uint16_t)>(&head[1]);
+				// }
+				
 			}
 			else
 			{
@@ -107,13 +108,13 @@ namespace asio2::detail
 				bytes = 9;
 				head = std::make_unique<std::uint8_t[]>(bytes);
 				head[0] = static_cast<std::uint8_t>(255);
-				std::uint64_t size = buffer.size();
+				std::uint64_t size = hton<size_t>(buffer.size());
 				std::memcpy(&head[1], reinterpret_cast<const void*>(&size), sizeof(std::uint64_t));
 				// use little endian
-				if (!is_little_endian())
-				{
-					swap_bytes<sizeof(std::uint64_t)>(&head[1]);
-				}
+				// if (!is_little_endian())
+				// {
+				// 	swap_bytes<sizeof(std::uint64_t)>(&head[1]);
+				// }
 			}
 
 			std::array<asio::const_buffer, 2> buffers

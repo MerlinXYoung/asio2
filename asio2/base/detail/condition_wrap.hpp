@@ -61,10 +61,11 @@ namespace asio2::detail
 					std::uint16_t payload_size = *(reinterpret_cast<const std::uint16_t*>(i.operator->()));
 
 					// use little endian
-					if (!is_little_endian())
-					{
-						swap_bytes<sizeof(std::uint16_t)>(reinterpret_cast<std::uint8_t*>(&payload_size));
-					}
+					// if (!is_little_endian())
+					// {
+					// 	swap_bytes<sizeof(std::uint16_t)>(reinterpret_cast<std::uint8_t*>(&payload_size));
+					// }
+					payload_size = hton(payload_size);
 
 					i += 2;
 					if (end - i < static_cast<diff_type>(payload_size))
@@ -85,10 +86,11 @@ namespace asio2::detail
 					std::uint64_t payload_size = *(reinterpret_cast<const std::uint64_t*>(i.operator->()));
 
 					// use little endian
-					if (!is_little_endian())
-					{
-						swap_bytes<sizeof(std::uint64_t)>(reinterpret_cast<std::uint8_t*>(&payload_size));
-					}
+					// if (!is_little_endian())
+					// {
+					// 	swap_bytes<sizeof(std::uint64_t)>(reinterpret_cast<std::uint8_t*>(&payload_size));
+					// }
+					payload_size = hton(payload_size);
 
 					i += 8;
 					if (end - i < static_cast<diff_type>(payload_size))

@@ -193,12 +193,12 @@ namespace asio2::detail
 		/**
 		 * @function : check whether the server is started 
 		 */
-		inline bool is_started() { return (super::is_started() && this->acceptor_.is_open()); }
+		inline bool is_started()const noexcept { return (super::is_started() && this->acceptor_.is_open()); }
 
 		/**
 		 * @function : check whether the server is stopped
 		 */
-		inline bool is_stopped() { return (super::is_stopped() && !this->acceptor_.is_open()); }
+		inline bool is_stopped()const noexcept { return (super::is_stopped() && !this->acceptor_.is_open()); }
 
 	public:
 		/**

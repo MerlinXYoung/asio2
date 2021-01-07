@@ -103,6 +103,55 @@ namespace asio2::detail
 			}
 			return std::pair(begin, false);
 		}
+	
+		std::pair<iterator, bool> fixed2_match_role(iterator begin, iterator end) 
+		{
+			iterator i = begin;
+			while (i != end)
+			{
+				if (end - i < sizeof(uint16_t))
+					break;
+
+				uint16_t payload_size = *(reinterpret_cast<const uint16_t*>(i.operator->()));
+				// std::cout<<"playload size:"<<payload_size<<std::endl;
+
+				// use little endian
+				payload_size = ntoh(payload_size);
+				// std::cout<<"playload size:"<<payload_size<<std::endl;
+
+				i += sizeof(uint16_t);
+				if (static_cast<uint16_t>(end - i) < payload_size)
+					break;
+
+				return std::pair(i + payload_size, true);
+			}
+			return std::pair(begin, false);
+		}
+
+		std::pair<iterator, bool> fixed4_match_role(iterator begin, iterator end) 
+		{
+			iterator i = begin;
+			while (i != end)
+			{
+				if (end - i < sizeof(uint32_t))
+					break;
+
+				uint32_t payload_size = *(reinterpret_cast<const uint32_t*>(i.operator->()));
+				// std::cout<<"playload size:"<<payload_size<<std::endl;
+
+				// use little endian
+				payload_size = ntoh(payload_size);
+				// std::cout<<"playload size:"<<payload_size<<std::endl;
+
+				i += sizeof(uint32_t);
+				if (static_cast<uint32_t>(end - i) < payload_size)
+					break;
+
+				return std::pair(i + payload_size, true);
+			}
+			return std::pair(begin, false);
+		}
+
 	}
 }
 
@@ -112,6 +161,8 @@ namespace asio2::detail
 	struct use_kcp_t {};
 	struct use_dgram_t {};
 	struct hook_buffer_t {};
+	struct use_fixed2_t {};
+	struct use_fixed4_t {};
 }
 
 namespace asio2::detail
@@ -213,6 +264,38 @@ namespace asio2::detail
 	};
 
 	template<>
+	class condition_traits<use_fixed2_t>
+	{
+	public:
+		using type = use_fixed2_t;
+
+		condition_traits(condition_traits&&) = default;
+		condition_traits(condition_traits const&) = default;
+		condition_traits& operator=(condition_traits&&) = default;
+		condition_traits& operator=(condition_traits const&) = default;
+
+		condition_traits(use_fixed2_t) {}
+		inline auto& operator()() { return fixed2_match_role; }
+	protected:
+	};
+
+	template<>
+	class condition_traits<use_fixed4_t>
+	{
+	public:
+		using type = use_fixed4_t;
+
+		condition_traits(condition_traits&&) = default;
+		condition_traits(condition_traits const&) = default;
+		condition_traits& operator=(condition_traits&&) = default;
+		condition_traits& operator=(condition_traits const&) = default;
+
+		condition_traits(use_fixed4_t) {}
+		inline auto& operator()() { return fixed4_match_role; }
+	protected:
+	};
+
+	template<>
 	class condition_traits<use_kcp_t>
 	{
 	public:
@@ -243,6 +326,13 @@ namespace asio2::detail
 		inline asio::detail::transfer_at_least_t operator()() { return asio::transfer_at_least(1); }
 	protected:
 	};
+
+	enum class match_role_type: uint8_t{
+			GENERAL=0,
+			DGRAM=1,
+			FIXED2=2,
+			FIXED4=3,
+		};
 }
 
 namespace asio2::detail
@@ -392,6 +482,10 @@ namespace asio2
 	constexpr static detail::use_kcp_t     use_kcp;
 
 	constexpr static detail::use_dgram_t   use_dgram;
+
+	constexpr static detail::use_fixed2_t   use_fixed2;
+
+	constexpr static detail::use_fixed4_t   use_fixed4;
 
 	constexpr static detail::hook_buffer_t hook_buffer;
 }

@@ -138,7 +138,7 @@ namespace asio2::detail
 		/**
 		 * @function : get the remote address
 		 */
-		inline std::string remote_address()
+		inline std::string remote_address()const noexcept
 		{
 			try
 			{
@@ -151,7 +151,7 @@ namespace asio2::detail
 		/**
 		 * @function : get the remote port
 		 */
-		inline unsigned short remote_port()
+		inline unsigned short remote_port()const noexcept
 		{
 			try
 			{
@@ -164,7 +164,7 @@ namespace asio2::detail
 		/**
 		 * @function : get this object hash key,used for session map
 		 */
-		inline const key_type & hash_key() const
+		inline const key_type & hash_key() const noexcept
 		{
 			return this->remote_endpoint_;
 		}
@@ -385,11 +385,11 @@ namespace asio2::detail
 		/**
 		 * @function : get the recv/read allocator object refrence
 		 */
-		inline auto & rallocator() { return this->wallocator_; }
+		inline auto & rallocator() noexcept{ return this->wallocator_; }
 		/**
 		 * @function : get the send/write allocator object refrence
 		 */
-		inline auto & wallocator() { return this->wallocator_; }
+		inline auto & wallocator() noexcept{ return this->wallocator_; }
 
 	protected:
 		/// buffer

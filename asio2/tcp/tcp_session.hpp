@@ -99,7 +99,7 @@ namespace asio2::detail
 		inline void start(condition_wrap<MatchCondition> condition)
 		{
 			// Used to test whether the behavior of different compilers is consistent
-			static_assert(tcp_send_op<derived_t, args_t>::template has_member_dgram<self>::value,
+			static_assert(tcp_send_op<derived_t, args_t>::template has_member_match_role_type<self>::value,
 				"The behavior of different compilers is not consistent");
 
 			try
@@ -148,7 +148,7 @@ namespace asio2::detail
 		/**
 		 * @function : get this object hash key,used for session map
 		 */
-		inline const key_type hash_key() const
+		inline const key_type hash_key() const noexcept
 		{
 			return reinterpret_cast<key_type>(this);
 		}
@@ -163,10 +163,18 @@ namespace asio2::detail
 			this->reset_connect_time();
 			this->update_alive_time();
 
+			// if constexpr (std::is_same_v<MatchCondition, use_dgram_t>)
+			// 	this->dgram_ = true;
+			// else
+			// 	this->dgram_ = false;
 			if constexpr (std::is_same_v<MatchCondition, use_dgram_t>)
-				this->dgram_ = true;
+				this->match_role_type_ = match_role_type::DGRAM;
+			else if constexpr (std::is_same_v<MatchCondition, use_fixed2_t>)
+				this->match_role_type_ = match_role_type::FIXED2;
+			else if constexpr (std::is_same_v<MatchCondition, use_fixed4_t>)
+				this->match_role_type_ = match_role_type::FIXED4;
 			else
-				this->dgram_ = false;
+				this->match_role_type_ = match_role_type::GENERAL;
 
 			// set keeplive options
 			this->keep_alive_options();
@@ -343,7 +351,8 @@ namespace asio2::detail
 		handler_memory<size_op<>, std::true_type> wallocator_;
 
 		/// Does it have the same datagram mechanism as udp?
-		bool                                      dgram_ = false;
+		// bool                                      dgram_ = false;
+		match_role_type match_role_type_ = match_role_type::GENERAL;
 	};
 }
 

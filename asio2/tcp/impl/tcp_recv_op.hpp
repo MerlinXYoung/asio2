@@ -33,7 +33,7 @@ namespace asio2::detail
 		/**
 		 * @constructor
 		 */
-		tcp_recv_op() {}
+		tcp_recv_op() = default;
 
 		/**
 		 * @destructor
@@ -116,6 +116,20 @@ namespace asio2::detail
 						derive._fire_recv(this_ptr, std::string_view(reinterpret_cast<
 							std::string_view::const_pointer>(buffer + 1 + 8), bytes_recvd - 1 - 8), condition);
 					}
+				}
+				else if constexpr (std::is_same_v<MatchCondition, use_fixed2_t>)
+				{
+					const std::uint8_t* buffer = static_cast<const std::uint8_t*>(derive.buffer().data().data());
+					derive._fire_recv(this_ptr, std::string_view(reinterpret_cast<
+						std::string_view::const_pointer>(buffer  + 2), bytes_recvd  - 2), condition);
+	
+				}
+				else if constexpr (std::is_same_v<MatchCondition, use_fixed4_t>)
+				{
+					const std::uint8_t* buffer = static_cast<const std::uint8_t*>(derive.buffer().data().data());
+					derive._fire_recv(this_ptr, std::string_view(reinterpret_cast<
+						std::string_view::const_pointer>(buffer  + 4), bytes_recvd  - 4), condition);
+	
 				}
 				else
 				{

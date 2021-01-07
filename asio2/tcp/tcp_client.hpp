@@ -381,7 +381,7 @@ namespace asio2::detail
 		bool _do_connect(String&& host, StrOrInt&& port, condition_wrap<MatchCondition> condition)
 		{
 			// Used to test whether the behavior of different compilers is consistent
-			static_assert(tcp_send_op<derived_t, args_t>::template has_member_dgram<self>::value,
+			static_assert(tcp_send_op<derived_t, args_t>::template has_member_match_role_type<self>::value,
 				"The behavior of different compilers is not consistent");
 
 			state_t expected = state_t::stopped;
@@ -457,10 +457,18 @@ namespace asio2::detail
 		template<typename MatchCondition>
 		inline void _do_init(condition_wrap<MatchCondition>)
 		{
+			// if constexpr (std::is_same_v<MatchCondition, use_dgram_t>)
+			// 	this->dgram_ = true;
+			// else
+			// 	this->dgram_ = false;
 			if constexpr (std::is_same_v<MatchCondition, use_dgram_t>)
-				this->dgram_ = true;
+				this->match_role_type_ = match_role_type::DGRAM;
+			else if constexpr (std::is_same_v<MatchCondition, use_fixed2_t>)
+				this->match_role_type_ = match_role_type::FIXED2;
+			else if constexpr (std::is_same_v<MatchCondition, use_fixed4_t>)
+				this->match_role_type_ = match_role_type::FIXED4;
 			else
-				this->dgram_ = false;
+				this->match_role_type_ = match_role_type::GENERAL;
 		}
 
 		template<typename MatchCondition>
@@ -633,7 +641,8 @@ namespace asio2::detail
 		}
 
 	protected:
-		bool dgram_ = false;
+		// bool dgram_ = false;
+		match_role_type match_role_type_ = match_role_type::GENERAL;
 	};
 }
 

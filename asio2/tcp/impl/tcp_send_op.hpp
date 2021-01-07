@@ -31,21 +31,18 @@ namespace asio2::detail
 	class tcp_send_op
 	{
 	protected:
+
 		template<class, class = std::void_t<>>
-		struct has_member_dgram : std::false_type {};
+		struct has_member_match_role_type : std::false_type {};
 
 		template<class T>
-		struct has_member_dgram<T, std::void_t<decltype(T::dgram_)>> : std::true_type {};
-
-		//template<class T>
-		//struct has_member_dgram<T, std::void_t<decltype(T::dgram_), std::enable_if_t<
-		//	std::is_same_v<decltype(T::dgram_), bool>>>> : std::true_type {};
+		struct has_member_match_role_type<T, std::void_t<decltype(T::match_role_type_)>> : std::true_type {};
 
 	public:
 		/**
 		 * @constructor
 		 */
-		tcp_send_op() {}
+		tcp_send_op() = default;
 
 		/**
 		 * @destructor
@@ -58,11 +55,21 @@ namespace asio2::detail
 		{
 			derived_t& derive = static_cast<derived_t&>(*this);
 
-			if constexpr (has_member_dgram<derived_t>::value)
+			if constexpr (has_member_match_role_type<derived_t>::value)
 			{
-				if (derive.dgram_)
+				//std::cout<<"match_role_type:"<<(int)derive.match_role_type_<<std::endl;
+				switch (derive.match_role_type_)
 				{
+					case match_role_type::GENERAL:
+					return derive._tcp_send_general(asio::buffer(data), std::forward<Callback>(callback));
+					case match_role_type::DGRAM:
 					return derive._tcp_send_dgram(asio::buffer(data), std::forward<Callback>(callback));
+					case match_role_type::FIXED2:
+					return derive._tcp_send_fixed2(asio::buffer(data), std::forward<Callback>(callback));
+					case match_role_type::FIXED4:
+					return derive._tcp_send_fixed4(asio::buffer(data), std::forward<Callback>(callback));
+					default:
+						assert(false);
 				}
 			}
 			else
@@ -145,6 +152,88 @@ namespace asio2::detail
 				}
 			}));
 			return true;
+		}
+
+		template<class BufferSequence, class Callback>
+		inline bool _tcp_send_fixed2(BufferSequence&& buffer, Callback&& callback)
+		{
+			derived_t& derive = static_cast<derived_t&>(*this);
+			if(buffer.size() >= (std::numeric_limits<std::uint16_t>::max)())
+			{
+				return false;
+			}
+			std::unique_ptr<std::uint16_t> head = std::make_unique<std::uint16_t>();
+			//std::cout<<"session:"<<this<<"send size:"<<buffer.size()<<std::endl;
+			*head = hton<std::uint16_t>(buffer.size());
+
+			//std::cout<<"session:"<<this<<"send size:"<<buffer.size()<<std::endl;
+
+			std::array<asio::const_buffer, 2> buffers
+			{
+				asio::buffer(reinterpret_cast<const void*>(head.get()), sizeof(uint16_t)),
+				std::forward<BufferSequence>(buffer)
+			};
+
+			asio::async_write(derive.stream(), buffers, 
+				make_allocator(derive.wallocator(),
+					[&derive, p = derive.selfptr(), head = std::move(head),
+					callback = std::forward<Callback>(callback)]
+			(const error_code& ec, std::size_t bytes_sent) mutable
+			{
+				set_last_error(ec);
+
+				if (ec)
+				{
+					callback(ec, bytes_sent);
+
+					// must stop, otherwise re-sending will cause header confusion
+					derive._do_disconnect(ec);
+				}
+				else
+				{
+					callback(ec, bytes_sent - sizeof(uint16_t));
+				}
+			}));
+			return true;
+		}
+
+		template<class BufferSequence, class Callback>
+		inline bool _tcp_send_fixed4(BufferSequence&& buffer, Callback&& callback)
+		{
+			derived_t& derive = static_cast<derived_t&>(*this);
+			if(buffer.size() >= (std::numeric_limits<std::uint32_t>::max)())
+			{
+				return false;
+			}
+			std::unique_ptr<std::uint32_t> head = std::make_unique<std::uint32_t>();
+			*head = hton<std::uint32_t>(buffer.size());
+
+			std::array<asio::const_buffer, 2> buffers
+			{
+				asio::buffer(reinterpret_cast<const void*>(head.get()), sizeof(uint32_t)),
+				std::forward<BufferSequence>(buffer)
+			};
+
+			asio::async_write(derive.stream(), buffers, 
+				make_allocator(derive.wallocator(),
+					[&derive, p = derive.selfptr(),head = std::move(head),
+					callback = std::forward<Callback>(callback)]
+			(const error_code& ec, std::size_t bytes_sent) mutable
+			{
+				set_last_error(ec);
+
+				if (ec)
+				{
+					callback(ec, bytes_sent);
+
+					// must stop, otherwise re-sending will cause header confusion
+					derive._do_disconnect(ec);
+				}
+				else
+				{
+					callback(ec, bytes_sent - sizeof(uint32_t));
+				}
+			}));
 		}
 
 		template<class BufferSequence, class Callback>

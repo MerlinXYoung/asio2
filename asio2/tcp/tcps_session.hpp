@@ -69,15 +69,13 @@ namespace asio2::detail
 		/**
 		 * @destructor
 		 */
-		~tcps_session_impl_t()
-		{
-		}
+		~tcps_session_impl_t() = default;
 
 	public:
 		/**
 		 * @function : get this object hash key,used for session map
 		 */
-		inline const key_type hash_key() const
+		inline const key_type hash_key() const  noexcept
 		{
 			return reinterpret_cast<key_type>(this);
 		}

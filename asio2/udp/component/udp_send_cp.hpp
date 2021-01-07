@@ -734,7 +734,6 @@ namespace asio2::detail
 			// so we captured the resolver_ptr into the lambda callback function.
 			resolver_type * resolver_pointer = resolver_ptr.get();
 			resolver_pointer->async_resolve(std::forward<String>(host), to_string(std::forward<StrOrInt>(port)),
-				asio::bind_executor(derive.io(),
 					[&derive, p = derive.selfptr(), resolver_ptr = std::move(resolver_ptr),
 					data = std::forward<Data>(data), callback = std::forward<Callback>(callback)]
 			(const error_code& ec, const endpoints_type& endpoints) mutable
@@ -764,7 +763,7 @@ namespace asio2::detail
 						});
 					}
 				}
-			}));
+			});
 			return true;
 		}
 	};

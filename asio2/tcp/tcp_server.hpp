@@ -330,7 +330,8 @@ namespace asio2::detail
 		/**
 		 * @function : get the acceptor refrence
 		 */
-		inline asio::ip::tcp::acceptor & acceptor() { return this->acceptor_; }
+		inline asio::ip::tcp::acceptor & acceptor() noexcept { return this->acceptor_; }
+		inline const asio::ip::tcp::acceptor & acceptor() const noexcept { return this->acceptor_; }
 
 	protected:
 		template<typename String, typename StrOrInt, typename MatchCondition>
@@ -470,8 +471,7 @@ namespace asio2::detail
 
 				// start timer to hold the acceptor io_context
 				this->counter_timer_.expires_after((std::chrono::nanoseconds::max)());
-				this->counter_timer_.async_wait(asio::bind_executor(
-					this->io_, [](const error_code&) {}));
+				this->counter_timer_.async_wait([](const error_code&) {});
 
 				// stop all the sessions, the session::stop must be no blocking,
 				// otherwise it may be cause loop lock.
@@ -522,13 +522,12 @@ namespace asio2::detail
 				std::shared_ptr<session_t> session_ptr = this->derived()._make_session();
 
 				auto& socket = session_ptr->socket().lowest_layer();
-				this->acceptor_.async_accept(socket, asio::bind_executor(this->io_,
-					make_allocator(this->rallocator_,
+				this->acceptor_.async_accept(socket, make_allocator(this->rallocator_,
 						[this, sptr = std::move(session_ptr), condition]
 				(const error_code& ec) mutable
 				{
 					this->derived()._handle_accept(ec, std::move(sptr), std::move(condition));
-				})));
+				}));
 			}
 			// handle exception,may be is the exception "Too many open files" (exception code : 24)
 			catch (system_error & e)
@@ -536,8 +535,7 @@ namespace asio2::detail
 				set_last_error(e);
 
 				this->acceptor_timer_.expires_after(std::chrono::seconds(1));
-				this->acceptor_timer_.async_wait(asio::bind_executor(this->io_,
-					make_allocator(this->rallocator_, [this, condition]
+				this->acceptor_timer_.async_wait(make_allocator(this->rallocator_, [this, condition]
 					(const error_code& ec) mutable
 				{
 					set_last_error(ec);
@@ -547,7 +545,7 @@ namespace asio2::detail
 					{
 						this->derived()._post_accept(std::move(condition));
 					}));
-				})));
+				}));
 			}
 		}
 

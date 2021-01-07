@@ -35,8 +35,8 @@ namespace asio2
 	{
 	public:
 		explicit async_event(asio::io_context& io)
-			: event_timer_io_(io)
-			, event_timer_(io)
+			// : event_timer_io_(io)
+			: event_timer_(io)
 		{
 		}
 
@@ -49,12 +49,12 @@ namespace asio2
 
 			// bind is used to adapt the user provided handler to the 
 			// timer's wait handler type requirement.
-			event_timer_.async_wait(asio::bind_executor(event_timer_io_,
+			event_timer_.async_wait(
 				[handler = std::forward<WaitHandler>(handler),
 				this_ptr = this->derived().selfptr()](const error_code&) mutable
 			{
 				handler();
-			}));
+			});
 		}
 
 		template <typename WaitHandler, typename Allocator>
@@ -66,12 +66,12 @@ namespace asio2
 
 			// bind is used to adapt the user provided handler to the 
 			// timer's wait handler type requirement.
-			event_timer_.async_wait(asio::bind_executor(event_timer_io_,
+			event_timer_.async_wait(
 				detail::make_allocator(allocator, [handler = std::forward<WaitHandler>(handler),
 					this_ptr = this->derived().selfptr()](const error_code&) mutable
 			{
 				handler();
-			})));
+			}));
 		}
 
 		/**
@@ -85,7 +85,7 @@ namespace asio2
 
 	private:
 		/// The io (include io_context and strand) used for the timer.
-		asio::io_context     & event_timer_io_;
+		// asio::io_context     & event_timer_io_;
 
 		/// Used to implementing asynchronous async_event
 		asio::steady_timer event_timer_;

@@ -79,7 +79,7 @@ namespace asio2::detail
 			return DataT{};
 		}
 
-		inline std::any& user_data_any() { return this->user_data_; }
+		inline std::any& user_data_any() noexcept{ return this->user_data_; }
 
 	protected:
 		/// user data

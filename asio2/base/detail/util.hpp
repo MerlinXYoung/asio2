@@ -186,14 +186,14 @@ namespace asio2::detail
 			[&io, duration, f = std::forward<Fn>(fn), timer, post]() mutable
 		{
 			timer->expires_after(duration);
-			timer->async_wait(asio::bind_executor(io, [&f, &post]
-			(const error_code & ec) mutable
+			timer->async_wait(
+				[&f, &post](const error_code & ec) mutable
 			{
 				if (f(ec))
 					(**post)();
 				else
 					(*post).reset();
-			}));
+			});
 		});
 		(**post)();
 		return timer;

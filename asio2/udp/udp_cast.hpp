@@ -410,11 +410,11 @@ namespace asio2::detail
 			{
 				this->socket_.async_receive_from(
 					this->buffer_.prepare(this->buffer_.pre_size()), this->remote_endpoint_,
-					asio::bind_executor(this->io_, make_allocator(this->rallocator_,
+					make_allocator(this->rallocator_,
 						[this, condition = std::move(condition)](const error_code& ec, std::size_t bytes_recvd)
 				{
 					this->derived()._handle_recv(ec, bytes_recvd, std::move(condition));
-				})));
+				}));
 			}
 			catch (system_error & e)
 			{

@@ -70,7 +70,7 @@ namespace asio2::detail
 		/**
 		 * get the binded local endpoint refrence
 		 */
-		inline endpoint_type& local_endpoint() { return this->local_endpoint_; }
+		inline const endpoint_type& local_endpoint() const noexcept{ return this->local_endpoint_; }
 
 	protected:
 		/// local bind endpoint

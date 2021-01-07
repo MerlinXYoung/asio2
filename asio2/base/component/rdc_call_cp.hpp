@@ -670,7 +670,7 @@ namespace asio2::detail
 					condition.invoker().emplace(id, timer, std::move(invoker));
 
 					timer->expires_after(timeout);
-					timer->async_wait(asio::bind_executor(derive.io(),
+					timer->async_wait(
 						[&derive, id, this_ptr = std::move(this_ptr), condition]
 					(const error_code& ec) mutable
 					{
@@ -684,7 +684,7 @@ namespace asio2::detail
 							condition.invoker().erase(iter);
 							detail::ignore_unused(tmer);
 						}
-					}));
+					});
 
 					send_data_t data = fn_data();
 					return derive._do_send(data, [&derive, id = std::move(id),

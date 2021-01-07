@@ -45,7 +45,7 @@ namespace asio2::detail
 		/**
 		 * @function : get silence timeout value ,unit : second
 		 */
-		inline std::chrono::steady_clock::duration silence_timeout() const
+		inline std::chrono::steady_clock::duration silence_timeout() const noexcept
 		{
 			return this->silence_timeout_;
 		}
@@ -54,7 +54,7 @@ namespace asio2::detail
 		 * @function : set silence timeout value
 		 */
 		template<class Rep, class Period>
-		inline derived_t & silence_timeout(std::chrono::duration<Rep, Period> duration)
+		inline derived_t & silence_timeout(std::chrono::duration<Rep, Period> duration) noexcept
 		{
 			this->silence_timeout_ = duration;
 			return static_cast<derived_t&>(*this);
@@ -71,11 +71,11 @@ namespace asio2::detail
 			if (duration > std::chrono::milliseconds(0))
 			{
 				this->silence_timer_.expires_after(duration);
-				this->silence_timer_.async_wait(asio::bind_executor(derive.io(),
+				this->silence_timer_.async_wait(
 					[&derive, self_ptr = std::move(this_ptr)](const error_code & ec)
 				{
 					derive._handle_silence_timer(ec, std::move(self_ptr));
-				}));
+				});
 			}
 		}
 
@@ -105,7 +105,7 @@ namespace asio2::detail
 			}
 		}
 
-		inline void _stop_silence_timer()
+		inline void _stop_silence_timer() noexcept
 		{
 			this->silence_timer_canceled_.test_and_set();
 			this->silence_timer_.cancel(ec_ignore);

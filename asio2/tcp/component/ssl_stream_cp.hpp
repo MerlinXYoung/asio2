@@ -117,7 +117,7 @@ namespace asio2::detail
 
 				// when server call ssl stream sync shutdown first,if the client socket is
 				// not closed forever,then here shutdowm will blocking forever.
-				this->ssl_stream_->async_shutdown(asio::bind_executor(derive.io(),
+				this->ssl_stream_->async_shutdown(
 					[this, this_ptr = std::move(this_ptr), timer = std::move(timer)]
 				(const error_code& ec) mutable
 				{
@@ -132,7 +132,7 @@ namespace asio2::detail
 					// When the client auto reconnect, SSL_clear must be called,
 					// otherwise the SSL handshake will failed.
 					SSL_clear(this->ssl_stream_->native_handle());
-				}));
+				});
 			};
 
 			derive.push_event([&derive, t = std::move(task)](event_queue_guard<derived_t>&& g) mutable
@@ -181,8 +181,7 @@ namespace asio2::detail
 					return false;
 				});
 
-				this->ssl_stream_->async_handshake(this->ssl_type_,
-					asio::bind_executor(derive.io(), make_allocator(derive.rallocator(),
+				this->ssl_stream_->async_handshake(this->ssl_type_,make_allocator(derive.rallocator(),
 						[&derive, self_ptr = std::move(this_ptr), g = std::move(g), condition = std::move(condition),
 						flag_ptr = std::move(flag_ptr), timer = std::move(timer)]
 				(const error_code& ec) mutable
@@ -195,7 +194,7 @@ namespace asio2::detail
 							std::move(self_ptr), std::move(condition));
 					else
 						derive._handle_handshake(ec, std::move(self_ptr), std::move(condition));
-				})));
+				}));
 			};
 
 			derive.push_event([&derive, t = std::move(task)](event_queue_guard<derived_t>&& g) mutable

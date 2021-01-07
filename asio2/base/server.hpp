@@ -91,7 +91,7 @@ namespace asio2::detail
 		/**
 		 * @function : start the server
 		 */
-		inline bool start()
+		inline bool start() noexcept
 		{
 			return true;
 		}
@@ -146,7 +146,7 @@ namespace asio2::detail
 		/**
 		 * @function : check whether the server is started 
 		 */
-		inline bool is_started() const
+		inline bool is_started() const noexcept
 		{
 			return (this->state_ == state_t::started);
 		}
@@ -154,7 +154,7 @@ namespace asio2::detail
 		/**
 		 * @function : check whether the server is stopped
 		 */
-		inline bool is_stopped() const
+		inline bool is_stopped() const noexcept
 		{
 			return (this->state_ == state_t::stopped);
 		}
@@ -224,12 +224,13 @@ namespace asio2::detail
 		/**
 		 * @function : get the acceptor refrence,derived classes must override this function
 		 */
-		inline auto & acceptor() { return this->derived().acceptor(); }
+		inline auto & acceptor() noexcept { return this->derived().acceptor(); }
+		inline const auto & acceptor() const noexcept { return this->derived().acceptor(); }
 
 		/**
 		 * @function : get the listen address
 		 */
-		inline std::string listen_address()
+		inline std::string listen_address()const noexcept
 		{
 			try
 			{
@@ -242,7 +243,7 @@ namespace asio2::detail
 		/**
 		 * @function : get the listen port
 		 */
-		inline unsigned short listen_port()
+		inline unsigned short listen_port()const noexcept
 		{
 			try
 			{
@@ -256,7 +257,7 @@ namespace asio2::detail
 		/**
 		 * @function : get connected session count
 		 */
-		inline std::size_t session_count() { return this->sessions_.size(); }
+		inline std::size_t session_count() const noexcept{ return this->sessions_.size(); }
 
 		/**
 		 * @function :
@@ -277,8 +278,8 @@ namespace asio2::detail
 		 * bool(std::shared_ptr<asio2::xxx_session>& session_ptr)
 		 * @return   : std::shared_ptr<asio2::xxx_session>
 		 */
-		inline std::shared_ptr<session_t> find_session_if(
-			const std::function<bool(std::shared_ptr<session_t>&)> & fn)
+		inline std::shared_ptr<session_t> find_session_if (
+			const std::function<bool(const std::shared_ptr<session_t>&)> & fn)
 		{
 			return std::shared_ptr<session_t>(this->sessions_.find_if(fn));
 		}
@@ -286,21 +287,21 @@ namespace asio2::detail
 		/**
 		 * @function : get the io object refrence
 		 */
-		inline io_t & io() { return this->io_; }
+		inline io_t & io() noexcept { return this->io_; }
 
 	protected:
 		/**
 		 * @function : get the recv/read allocator object refrence
 		 */
-		inline auto & rallocator() { return this->rallocator_; }
+		inline auto & rallocator() noexcept{ return this->rallocator_; }
 		/**
 		 * @function : get the send/write/post allocator object refrence
 		 */
-		inline auto & wallocator() { return this->wallocator_; }
+		inline auto & wallocator() noexcept{ return this->wallocator_; }
 
-		inline session_mgr_t<session_t> & sessions() { return this->sessions_; }
-		inline listener_t               & listener() { return this->listener_; }
-		inline std::atomic<state_t>     & state()    { return this->state_;    }
+		inline session_mgr_t<session_t> & sessions() noexcept{ return this->sessions_; }
+		inline listener_t               & listener() noexcept{ return this->listener_; }
+		inline std::atomic<state_t>     & state()    noexcept{ return this->state_;    }
 		inline std::shared_ptr<derived_t> selfptr()  { return std::shared_ptr<derived_t>{}; }
 
 	protected:

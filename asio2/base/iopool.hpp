@@ -49,7 +49,7 @@ namespace asio2::detail
 		 * @constructor
 		 * @param    : concurrency - the pool size,default is double the number of CPU cores
 		 */
-		explicit iopool(std::size_t concurrency = std::thread::hardware_concurrency() * 2)
+		explicit iopool(std::size_t concurrency)
 			: ios_(concurrency == 0 ? std::thread::hardware_concurrency() * 2 : concurrency)
 		{
 			this->threads_.reserve(this->ios_.size());
@@ -92,7 +92,7 @@ namespace asio2::detail
 				 * the run(), run_one(), poll() or poll_one() functions.
 				 */
 				io.restart();
-
+				
 				this->works_.emplace_back(io.get_executor());
 
 				// start work thread
@@ -164,7 +164,7 @@ namespace asio2::detail
 		/**
 		 * @function : check whether the iopool is started
 		 */
-		inline bool is_started() const
+		inline bool is_started() const noexcept
 		{
 			return (!this->stopped_);
 		}
@@ -172,7 +172,7 @@ namespace asio2::detail
 		/**
 		 * @function : check whether the iopool is stopped
 		 */
-		inline bool is_stopped() const
+		inline bool is_stopped() const noexcept
 		{
 			return (this->stopped_);
 		}
@@ -180,7 +180,7 @@ namespace asio2::detail
 		/**
 		 * @function : get an io_context to use
 		 */
-		inline asio::io_context & get(std::size_t index = static_cast<std::size_t>(-1))
+		inline asio::io_context & get(std::size_t index = static_cast<std::size_t>(-1)) noexcept
 		{
 			// Use a round-robin scheme to choose the next io_context to use. 
 			return this->ios_[index < this->ios_.size() ? index : ((++(this->next_)) % this->ios_.size())];
@@ -189,7 +189,7 @@ namespace asio2::detail
 		/**
 		 * @function : Determine whether current code is running in the iopool threads.
 		 */
-		inline bool running_in_iopool_threads()
+		inline bool running_in_iopool_threads()const noexcept
 		{
 			std::thread::id curr_tid = std::this_thread::get_id();
 			for (auto & thread : this->threads_)
@@ -197,6 +197,10 @@ namespace asio2::detail
 				if (curr_tid == thread.get_id())
 					return true;
 			}
+			// for(auto& io: this->ios_){
+			// 	if(io.get_executor().running_in_this_thread())
+			// 		return true;
+			// }
 			return false;
 		}
 

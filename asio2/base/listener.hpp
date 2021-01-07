@@ -112,20 +112,21 @@ namespace asio2::detail
 		func_type fn_;
 	};
 
-	class listener_t
+	template<class EVENT_TYPE>
+	class listener_impl_t
 	{
 	public:
-		listener_t() {}
-		~listener_t() = default;
+		listener_impl_t() = default;
+		~listener_impl_t() = default;
 
 		template<class T>
-		inline void bind(event_type e, T&& observer)
+		inline void bind(EVENT_TYPE e, T&& observer)
 		{
 			this->observers_[enum_to_int(e)] = std::unique_ptr<base_observer>(new T(std::forward<T>(observer)));
 		}
 
 		template<class... Args>
-		inline void notify(event_type e, Args&&... args)
+		inline void notify(EVENT_TYPE e, Args&&... args)
 		{
 			using observer_type = observer_t<Args...>;
 			observer_type * observer_ptr = static_cast<observer_type *>(this->observers_[enum_to_int(e)].get());
@@ -135,14 +136,16 @@ namespace asio2::detail
 			}
 		}
 
-		inline std::unique_ptr<base_observer>& find(event_type e)
+		inline std::unique_ptr<base_observer>& find(EVENT_TYPE e)
 		{
 			return this->observers_[enum_to_int(e)];
 		}
 
 	protected:
-		std::array<std::unique_ptr<base_observer>, enum_to_int(event_type::max)> observers_;
+		std::array<std::unique_ptr<base_observer>, enum_to_int(EVENT_TYPE::max)> observers_;
 	};
+
+	using listener_t = listener_impl_t<event_type>;
 }
 
 #endif // !__ASIO2_LISTENER_HPP__

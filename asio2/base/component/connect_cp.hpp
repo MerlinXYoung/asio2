@@ -127,8 +127,7 @@ namespace asio2::detail
 					derive.post([&derive, this_ptr, condition]() mutable
 					{
 						derive._post_connect_timeout_timer(derive.connect_timeout(), this_ptr,
-							[&derive, this_ptr, condition]
-						(const error_code& ec) mutable
+							[&derive, this_ptr, condition](const error_code& ec) mutable
 						{
 							detail::ignore_unused(this_ptr, condition);
 
@@ -215,7 +214,6 @@ namespace asio2::detail
 				// Before async_resolve execution is complete, we must hold the resolver object.
 				// so we captured the resolver_ptr into the lambda callback function.
 				resolver_rptr->async_resolve(this->host_, this->port_,
-					asio::bind_executor(derive.io(),
 						[this, &derive, this_ptr = std::move(this_ptr), condition = std::move(condition),
 						resolver_ptr = std::move(resolver_ptr)]
 				(const error_code& ec, const endpoints_type& endpoints) mutable
@@ -229,7 +227,7 @@ namespace asio2::detail
 					else
 						derive._post_connect(ec, this->endpoints_.begin(),
 							std::move(this_ptr), std::move(condition));
-				}));
+				});
 			});
 		}
 
@@ -252,8 +250,8 @@ namespace asio2::detail
 				}
 
 				// Start the asynchronous connect operation.
-				derive.socket().lowest_layer().async_connect(iter->endpoint(),
-					asio::bind_executor(derive.io(), make_allocator(derive.rallocator(),
+				derive.socket().lowest_layer().async_connect(iter->endpoint(), 
+					make_allocator(derive.rallocator(),
 						[&derive, iter, this_ptr, condition](const error_code & ec) mutable
 				{
 					set_last_error(ec);
@@ -262,7 +260,7 @@ namespace asio2::detail
 						derive._post_connect(ec, ++iter, std::move(this_ptr), std::move(condition));
 					else
 						derive._handle_connect(ec, std::move(this_ptr), std::move(condition));
-				})));
+				}));
 			}
 			catch (system_error & e)
 			{

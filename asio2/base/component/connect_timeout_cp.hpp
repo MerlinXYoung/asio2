@@ -44,13 +44,13 @@ namespace asio2::detail
 		/**
 		 * @function : get the connect timeout
 		 */
-		inline std::chrono::steady_clock::duration connect_timeout() { return this->connect_timeout_; }
+		inline std::chrono::steady_clock::duration connect_timeout() const noexcept { return this->connect_timeout_; }
 
 		/**
 		 * @function : set the connect timeout
 		 */
 		template<class Rep, class Period>
-		inline derived_t& connect_timeout(std::chrono::duration<Rep, Period> timeout)
+		inline derived_t& connect_timeout(std::chrono::duration<Rep, Period> timeout) noexcept
 		{
 			this->connect_timeout_ = timeout;
 			return static_cast<derived_t&>(*this);
@@ -68,7 +68,6 @@ namespace asio2::detail
 
 			this->connect_timeout_timer_.expires_after(duration);
 			this->connect_timeout_timer_.async_wait(
-				asio::bind_executor(derive.io(),
 					[&derive, self_ptr = std::move(this_ptr)](const error_code& ec) mutable
 			{
 				// bug fixed : 
@@ -78,7 +77,7 @@ namespace asio2::detail
 				// derive._handle_connect_timeout_timer(ec, std::move(self_ptr)); the self_ptr's 
 				// object will be destroyed, then below code "this->..." will cause crash.
 				derive._handle_connect_timeout_timer(ec, std::move(self_ptr));
-			}));
+			});
 		}
 
 		inline void _handle_connect_timeout_timer(const error_code& ec,
@@ -122,7 +121,6 @@ namespace asio2::detail
 
 			this->connect_timeout_timer_.expires_after(duration);
 			this->connect_timeout_timer_.async_wait(
-				asio::bind_executor(derive.io(),
 					[this, self_ptr = std::move(this_ptr), f = std::forward<Fn>(fn)]
 			(const error_code& ec) mutable
 			{
@@ -134,10 +132,10 @@ namespace asio2::detail
 				this->connect_timer_canceled_.clear();
 
 				f(ec);
-			}));
+			});
 		}
 
-		inline void _stop_connect_timeout_timer(asio::error_code ec)
+		inline void _stop_connect_timeout_timer(asio::error_code ec)noexcept
 		{
 			try
 			{
@@ -147,14 +145,15 @@ namespace asio2::detail
 			}
 			catch (system_error&) {}
 			catch (std::exception&) {}
+			catch (...) {}
 		}
 
-		inline bool _is_connect_timeout()
+		inline bool _is_connect_timeout()const noexcept
 		{
 			return this->connect_timeout_flag_.load();
 		}
 
-		inline asio::error_code _connect_error_code()
+		inline asio::error_code _connect_error_code() const noexcept
 		{
 			return this->connect_error_code_;
 		}

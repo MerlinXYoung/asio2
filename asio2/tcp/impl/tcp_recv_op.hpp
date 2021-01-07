@@ -58,22 +58,22 @@ namespace asio2::detail
 					std::is_same_v<MatchCondition, asio2::detail::hook_buffer_t>)
 				{
 					asio::async_read(derive.stream(), derive.buffer().base(), condition(),
-						asio::bind_executor(derive.io(), make_allocator(derive.rallocator(),
+						make_allocator(derive.rallocator(),
 							[&derive, self_ptr = std::move(this_ptr), condition]
 					(const error_code& ec, std::size_t bytes_recvd) mutable
 					{
 						derive._handle_recv(ec, bytes_recvd, std::move(self_ptr), std::move(condition));
-					})));
+					}));
 				}
 				else
 				{
 					asio::async_read_until(derive.stream(), derive.buffer().base(), condition(),
-						asio::bind_executor(derive.io(), make_allocator(derive.rallocator(),
+						make_allocator(derive.rallocator(),
 							[&derive, self_ptr = std::move(this_ptr), condition]
 					(const error_code& ec, std::size_t bytes_recvd) mutable
 					{
 						derive._handle_recv(ec, bytes_recvd, std::move(self_ptr), std::move(condition));
-					})));
+					}));
 				}
 			}
 			catch (system_error & e)

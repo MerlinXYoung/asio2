@@ -46,7 +46,7 @@ namespace asio2::detail
 			derived_t& derive = static_cast<derived_t&>(*this);
 
 			derive.ws_stream().async_write(asio::buffer(data),
-				asio::bind_executor(derive.io(), make_allocator(derive.wallocator(),
+				make_allocator(derive.wallocator(),
 					[&derive, p = derive.selfptr(), callback = std::forward<Callback>(callback)]
 			(const error_code& ec, std::size_t bytes_sent) mutable
 			{
@@ -59,7 +59,7 @@ namespace asio2::detail
 					// must stop, otherwise re-sending will cause body confusion
 					derive._do_disconnect(ec);
 				}
-			})));
+			}));
 
 			return true;
 		}
@@ -75,9 +75,8 @@ namespace asio2::detail
 
 			auto buffer = asio::buffer(*str);
 
-			derive.ws_stream().async_write(buffer, asio::bind_executor(derive.io(),
-				make_allocator(derive.wallocator(), [&derive, p = derive.selfptr(),
-					str = std::move(str), callback = std::forward<Callback>(callback)]
+			derive.ws_stream().async_write(buffer, make_allocator(derive.wallocator(), 
+			[&derive, p = derive.selfptr(), str = std::move(str), callback = std::forward<Callback>(callback)]
 					(const error_code& ec, std::size_t bytes_sent) mutable
 			{
 				set_last_error(ec);
@@ -89,7 +88,7 @@ namespace asio2::detail
 					// must stop, otherwise re-sending will cause body confusion
 					derive._do_disconnect(ec);
 				}
-			})));
+			}));
 
 			return true;
 		}

@@ -668,12 +668,12 @@ namespace asio2::detail
 			try
 			{
 				this->socket_.async_receive(this->buffer_.prepare(this->buffer_.pre_size()),
-					asio::bind_executor(this->io_, make_allocator(this->rallocator_,
+					make_allocator(this->rallocator_,
 						[this, self_ptr = std::move(this_ptr), condition = std::move(condition)]
 				(const error_code & ec, std::size_t bytes_recvd) mutable
 				{
 					this->derived()._handle_recv(ec, bytes_recvd, std::move(self_ptr), std::move(condition));
-				})));
+				}));
 			}
 			catch (system_error & e)
 			{

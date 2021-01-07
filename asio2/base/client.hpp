@@ -137,7 +137,7 @@ namespace asio2::detail
 		 * @param    : async_connect - asynchronous connect to the server or sync
 		 * @return   : true  - start successed , false - start failed
 		 */
-		inline bool start(bool async_connect = true)
+		inline bool start(bool async_connect = true)noexcept
 		{
 			return true;
 		}
@@ -203,7 +203,7 @@ namespace asio2::detail
 		/**
 		 * @function : check whether the client is started
 		 */
-		inline bool is_started() const
+		inline bool is_started() const noexcept
 		{
 			return (this->state_ == state_t::started && this->socket_.lowest_layer().is_open());
 		}
@@ -211,7 +211,7 @@ namespace asio2::detail
 		/**
 		 * @function : check whether the client is stopped
 		 */
-		inline bool is_stopped() const
+		inline bool is_stopped() const noexcept
 		{
 			return (this->state_ == state_t::stopped && !this->socket_.lowest_layer().is_open());
 		}
@@ -219,18 +219,18 @@ namespace asio2::detail
 		/**
 		 * @function : get the buffer object refrence
 		 */
-		inline buffer_wrap<buffer_type> & buffer() { return this->buffer_; }
+		inline buffer_wrap<buffer_type> & buffer() noexcept{ return this->buffer_; }
 
 		/**
 		 * @function : get the io object refrence
 		 */
-		inline io_t & io() { return this->io_; }
+		inline io_t & io() noexcept{ return this->io_; }
 
 		/**
 		 * @function : set the default remote call timeout for rpc/rdc
 		 */
 		template<class Rep, class Period>
-		inline derived_t & default_timeout(std::chrono::duration<Rep, Period> duration)
+		inline derived_t & default_timeout(std::chrono::duration<Rep, Period> duration)noexcept
 		{
 			this->rc_timeout_ = duration;
 			return (this->derived());
@@ -239,7 +239,7 @@ namespace asio2::detail
 		/**
 		 * @function : get the default remote call timeout for rpc/rdc
 		 */
-		inline std::chrono::steady_clock::duration default_timeout()
+		inline std::chrono::steady_clock::duration default_timeout() const noexcept
 		{
 			return this->rc_timeout_;
 		}
@@ -248,14 +248,14 @@ namespace asio2::detail
 		/**
 		 * @function : get the recv/read allocator object refrence
 		 */
-		inline auto & rallocator() { return this->rallocator_; }
+		inline auto & rallocator() noexcept{ return this->rallocator_; }
 		/**
 		 * @function : get the send/write allocator object refrence
 		 */
-		inline auto & wallocator() { return this->wallocator_; }
+		inline auto & wallocator() noexcept{ return this->wallocator_; }
 
-		inline listener_t                 & listener() { return this->listener_; }
-		inline std::atomic<state_t>       & state()    { return this->state_;    }
+		inline listener_t                 & listener() noexcept { return this->listener_; }
+		inline std::atomic<state_t>       & state()   noexcept { return this->state_;    }
 		inline std::shared_ptr<derived_t>   selfptr()  { return std::shared_ptr<derived_t>{}; }
 
 	protected:

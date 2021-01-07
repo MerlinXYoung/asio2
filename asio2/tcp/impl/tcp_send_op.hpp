@@ -123,7 +123,7 @@ namespace asio2::detail
 				std::forward<BufferSequence>(buffer)
 			};
 
-			asio::async_write(derive.stream(), buffers, asio::bind_executor(derive.io(),
+			asio::async_write(derive.stream(), buffers, 
 				make_allocator(derive.wallocator(),
 					[&derive, p = derive.selfptr(),
 					bytes, head = std::move(head),
@@ -143,7 +143,7 @@ namespace asio2::detail
 				{
 					callback(ec, bytes_sent - bytes);
 				}
-			})));
+			}));
 			return true;
 		}
 
@@ -152,8 +152,7 @@ namespace asio2::detail
 		{
 			derived_t& derive = static_cast<derived_t&>(*this);
 
-			asio::async_write(derive.stream(), buffer, asio::bind_executor(derive.io(),
-				make_allocator(derive.wallocator(),
+			asio::async_write(derive.stream(), buffer, make_allocator(derive.wallocator(),
 					[&derive, p = derive.selfptr(), callback = std::forward<Callback>(callback)]
 			(const error_code& ec, std::size_t bytes_sent) mutable
 			{
@@ -166,7 +165,7 @@ namespace asio2::detail
 					// must stop, otherwise re-sending will cause body confusion
 					derive._do_disconnect(ec);
 				}
-			})));
+			}));
 			return true;
 		}
 

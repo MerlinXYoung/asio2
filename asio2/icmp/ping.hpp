@@ -697,9 +697,9 @@ namespace asio2::detail
 			// Wait up to five seconds for a reply.
 			this->replies_ = 0;
 			this->timer_.expires_after(this->timeout_);
-			this->timer_.async_wait(asio::bind_executor(this->io_,
+			this->timer_.async_wait(
 				make_allocator(this->wallocator_,
-					std::bind(&self::_handle_timer, this, std::placeholders::_1))));
+					std::bind(&self::_handle_timer, this, std::placeholders::_1)));
 		}
 
 		void _handle_timer(const error_code & ec)
@@ -717,9 +717,8 @@ namespace asio2::detail
 			if (this->is_started())
 			{
 				this->timer_.expires_after(this->interval_);
-				this->timer_.async_wait(asio::bind_executor(this->io_,
-					make_allocator(this->wallocator_,
-						std::bind(&self::_post_send, this))));
+				this->timer_.async_wait(make_allocator(this->wallocator_,
+						std::bind(&self::_post_send, this)));
 			}
 		}
 
@@ -731,9 +730,9 @@ namespace asio2::detail
 			{
 				// Wait for a reply. We prepare the buffer to receive up to 64KB.
 				this->socket_.async_receive(this->buffer_.prepare(this->buffer_.pre_size()),
-					asio::bind_executor(this->io_, make_allocator(this->rallocator_,
+					make_allocator(this->rallocator_,
 						std::bind(&self::_handle_recv, this,
-							std::placeholders::_1, std::placeholders::_2))));
+							std::placeholders::_1, std::placeholders::_2)));
 			}
 			catch (system_error & e)
 			{

@@ -77,13 +77,13 @@ namespace asio2::detail
 			}));
 
 			timer->expires_after(delay);
-			timer->async_wait(asio::bind_executor(derive.io(),
+			timer->async_wait(
 				make_allocator(derive.wallocator(), [this, self = derive.selfptr(),
 					timer = std::move(timer), f = std::forward<Function>(f)](const error_code& ec) mutable
 			{
 				f();
 				this->timed_tasks_.erase(timer.get());
-			})));
+			}));
 			return (derive);
 		}
 
@@ -146,13 +146,13 @@ namespace asio2::detail
 			}));
 
 			timer->expires_after(delay);
-			timer->async_wait(asio::bind_executor(derive.io(),
+			timer->async_wait(
 				make_allocator(derive.wallocator(), [this, self = derive.selfptr(),
 					timer = std::move(timer), t = std::move(task)](const error_code& ec) mutable
 			{
 				t();
 				this->timed_tasks_.erase(timer.get());
-			})));
+			}));
 
 			return future;
 		}

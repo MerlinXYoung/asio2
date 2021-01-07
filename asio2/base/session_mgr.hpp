@@ -170,7 +170,7 @@ namespace asio2::detail
 		/**
 		 * @function : find the session by map key
 		 */
-		inline std::shared_ptr<session_t> find(const key_type & key)
+		inline std::shared_ptr<session_t> find(const key_type & key) const 
 		{
 			std::shared_lock<std::shared_mutex> guard(this->mutex_);
 			auto iter = this->sessions_.find(key);
@@ -180,7 +180,7 @@ namespace asio2::detail
 		/**
 		 * @function : find the session by user custom role
 		 */
-		inline std::shared_ptr<session_t> find_if(const std::function<bool(std::shared_ptr<session_t> &)> & fn)
+		inline std::shared_ptr<session_t> find_if(const std::function<bool(const std::shared_ptr<session_t> &)> & fn)const
 		{
 			std::shared_lock<std::shared_mutex> guard(this->mutex_);
 			auto iter = std::find_if(this->sessions_.begin(), this->sessions_.end(),
@@ -194,7 +194,7 @@ namespace asio2::detail
 		/**
 		 * @function : get session count
 		 */
-		inline std::size_t size()
+		inline std::size_t size() const noexcept
 		{
 			return this->sessions_.size();
 		}
@@ -202,7 +202,7 @@ namespace asio2::detail
 		/**
 		 * @function : Checks if the session container has no elements
 		 */
-		inline bool empty()
+		inline bool empty() const noexcept
 		{
 			return this->sessions_.empty();
 		}
@@ -212,7 +212,7 @@ namespace asio2::detail
 		std::unordered_map<key_type, std::shared_ptr<session_t>> sessions_;
 
 		/// use rwlock to make this session map thread safe
-		std::shared_mutex mutex_;
+		mutable std::shared_mutex mutex_;
 
 		io_t & io_;
 

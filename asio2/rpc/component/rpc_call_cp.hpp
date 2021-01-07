@@ -390,7 +390,7 @@ namespace asio2::detail
 							derive.reqs_.emplace(req.id(), std::move(ex));
 
 							timer->expires_after(timeout);
-							timer->async_wait(asio::bind_executor(derive.io(),
+							timer->async_wait(
 								[&derive, this_ptr, id = req.id()](const error_code & ec) mutable
 							{
 								if (ec == asio::error::operation_aborted)
@@ -401,7 +401,7 @@ namespace asio2::detail
 									auto& ex = iter->second;
 									ex(asio::error::timed_out, std::string_view{});
 								}
-							}));
+							});
 						}
 						else
 						{

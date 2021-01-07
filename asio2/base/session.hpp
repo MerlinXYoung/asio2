@@ -247,7 +247,7 @@ namespace asio2::detail
 		/**
 		 * @function : check whether the session is started
 		 */
-		inline bool is_started() const
+		inline bool is_started() const noexcept
 		{
 			return (this->state_ == state_t::started && this->socket_.lowest_layer().is_open());
 		}
@@ -255,7 +255,7 @@ namespace asio2::detail
 		/**
 		 * @function : check whether the session is stopped
 		 */
-		inline bool is_stopped() const
+		inline bool is_stopped() const noexcept
 		{
 			return (this->state_ == state_t::stopped && !this->socket_.lowest_layer().is_open());
 		}
@@ -263,7 +263,7 @@ namespace asio2::detail
 		/**
 		 * @function : get the buffer object refrence
 		 */
-		inline buffer_wrap<buffer_type> & buffer()
+		inline buffer_wrap<buffer_type> & buffer() noexcept
 		{
 			return this->buffer_;
 		}
@@ -271,7 +271,7 @@ namespace asio2::detail
 		/**
 		 * @function : get the io object refrence
 		 */
-		inline io_t & io()
+		inline io_t & io() noexcept
 		{
 			return this->io_;
 		}
@@ -280,7 +280,7 @@ namespace asio2::detail
 		 * @function : set the default remote call timeout for rpc/rdc
 		 */
 		template<class Rep, class Period>
-		inline derived_t & default_timeout(std::chrono::duration<Rep, Period> duration)
+		inline derived_t & default_timeout(std::chrono::duration<Rep, Period> duration) noexcept
 		{
 			this->rc_timeout_ = duration;
 			return (this->derived());
@@ -289,7 +289,7 @@ namespace asio2::detail
 		/**
 		 * @function : get the default remote call timeout for rpc/rdc
 		 */
-		inline std::chrono::steady_clock::duration default_timeout()
+		inline std::chrono::steady_clock::duration default_timeout() const noexcept
 		{
 			return this->rc_timeout_;
 		}

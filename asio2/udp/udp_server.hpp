@@ -348,7 +348,8 @@ namespace asio2::detail
 		/**
 		 * @function : get the acceptor refrence
 		 */
-		inline asio::ip::udp::socket & acceptor() { return this->acceptor_; }
+		inline asio::ip::udp::socket & acceptor() noexcept{ return this->acceptor_; }
+		inline const asio::ip::udp::socket & acceptor() const noexcept{ return this->acceptor_; }
 
 	protected:
 		template<typename String, typename StrOrInt, typename MatchCondition>
@@ -535,12 +536,12 @@ namespace asio2::detail
 			{
 				this->acceptor_.async_receive_from(
 					this->buffer_.prepare(this->buffer_.pre_size()), this->remote_endpoint_,
-					asio::bind_executor(this->io_, make_allocator(this->rallocator_,
+					make_allocator(this->rallocator_,
 						[this, condition = std::move(condition)]
 				(const error_code& ec, std::size_t bytes_recvd) mutable
 				{
 					this->derived()._handle_recv(ec, bytes_recvd, std::move(condition));
-				})));
+				}));
 			}
 			catch (system_error & e)
 			{

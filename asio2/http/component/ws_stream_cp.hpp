@@ -136,8 +136,7 @@ namespace asio2::detail
 
 				// Close the WebSocket connection
 				this->ws_stream_->async_close(websocket::close_code::normal,
-					asio::bind_executor(derive.io(),
-						[this, this_ptr = std::move(this_ptr), g = std::move(g), f = std::move(fn)]
+					[this, this_ptr = std::move(this_ptr), g = std::move(g), f = std::move(fn)]
 				(error_code ec) mutable
 				{
 					//if (ec)
@@ -150,7 +149,7 @@ namespace asio2::detail
 					this->ws_stream_->control_callback();
 
 					(f)();
-				}));
+				});
 			};
 
 			derive.push_event([&derive, t = std::move(task)](event_queue_guard<derived_t>&& g) mutable
@@ -176,13 +175,12 @@ namespace asio2::detail
 					ASIO2_ASSERT(bool(this->ws_stream_));
 					// Read a message into our buffer
 					this->ws_stream_->async_read(derive.buffer().base(),
-						asio::bind_executor(derive.io(),
 							make_allocator(derive.rallocator(),
 								[&derive, this_ptr = std::move(this_ptr), condition = std::move(condition)]
 					(const error_code & ec, std::size_t bytes_recvd) mutable
 					{
 						derive._handle_recv(ec, bytes_recvd, std::move(this_ptr), std::move(condition));
-					})));
+					}));
 				}
 				catch (system_error & e)
 				{
@@ -238,14 +236,14 @@ namespace asio2::detail
 			// on the another side.
 			derive.post([this, &derive, this_ptr = std::move(this_ptr), condition]() mutable
 			{
-				this->ws_stream_->control_callback(asio::bind_executor(derive.io(),
+				this->ws_stream_->control_callback(
 					[&derive, this_ptr = std::move(this_ptr), condition]
 				(websocket::frame_type kind, beast::string_view payload) mutable
 				{
 					// bug fixed : can't use "std::move(this_ptr)" below, otherwise 
 					// when enter this lambda next time, the "this_ptr" is nullptr.
 					derive._handle_control_callback(kind, payload, this_ptr, condition);
-				}));
+				});
 			});
 		}
 
@@ -313,12 +311,12 @@ namespace asio2::detail
 			{
 				// Perform the websocket handshake
 				this->ws_stream_->async_handshake(rep, derive.host_, derive.upgrade_target(),
-					asio::bind_executor(derive.io(), make_allocator(derive.rallocator(),
+					make_allocator(derive.rallocator(),
 						[&derive, this_ptr = std::move(this_ptr), condition = std::move(condition), g = std::move(g)]
 				(error_code const& ec) mutable
 				{
 					derive._handle_upgrade(ec, std::move(this_ptr), std::move(condition));
-				})));
+				}));
 			};
 
 			derive.push_event([&derive, t = std::move(task)](event_queue_guard<derived_t>&& g) mutable
@@ -344,13 +342,13 @@ namespace asio2::detail
 			auto task = [this, &derive, this_ptr, condition, &req](event_queue_guard<derived_t>&& g) mutable
 			{
 				// Accept the websocket handshake
-				this->ws_stream_->async_accept(req, asio::bind_executor(derive.io(),
+				this->ws_stream_->async_accept(req, 
 					make_allocator(derive.rallocator(),
 						[&derive, this_ptr = std::move(this_ptr), condition = std::move(condition), g = std::move(g)]
 				(error_code ec) mutable
 				{
 					derive._handle_upgrade(ec, std::move(this_ptr), std::move(condition));
-				})));
+				}));
 			};
 
 			derive.push_event([&derive, t = std::move(task)](event_queue_guard<derived_t>&& g) mutable
@@ -375,13 +373,12 @@ namespace asio2::detail
 			auto task = [this, &derive, this_ptr, condition](event_queue_guard<derived_t>&& g) mutable
 			{
 				// Accept the websocket handshake
-				this->ws_stream_->async_accept(asio::bind_executor(derive.io(),
-					make_allocator(derive.rallocator(),
+				this->ws_stream_->async_accept(make_allocator(derive.rallocator(),
 						[&derive, this_ptr = std::move(this_ptr), condition = std::move(condition), g = std::move(g)]
 				(error_code ec) mutable
 				{
 					derive._handle_upgrade(ec, std::move(this_ptr), std::move(condition));
-				})));
+				}));
 			};
 
 			derive.push_event([&derive, t = std::move(task)](event_queue_guard<derived_t>&& g) mutable

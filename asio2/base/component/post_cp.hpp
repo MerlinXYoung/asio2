@@ -196,26 +196,11 @@ namespace asio2::detail
 			std::future<return_type> future = task.get_future();
 
 			// Make sure we run on the strand
-#if 1
 			asio::dispatch(derive.io(), make_allocator(derive.wallocator(),
 				[t = std::move(task)]() mutable
 			{
 				t();
 			}));
-#else
-			if (derive.io().strand().running_in_this_thread())
-			{
-				task();
-			}
-			else
-			{
-				asio::post(derive.io(), make_allocator(derive.wallocator(),
-					[t = std::move(task)]() mutable
-				{
-					t();
-				}));
-			}
-#endif
 
 			return future;
 		}
@@ -223,7 +208,6 @@ namespace asio2::detail
 		/**
 		 * @function : Stop all timed tasks which you posted with a delay duration.
 		 */
-#if 1
 		inline derived_t& stop_all_timed_tasks()
 		{
 			derived_t& derive = static_cast<derived_t&>(*this);
@@ -239,31 +223,7 @@ namespace asio2::detail
 			}));
 			return (derive);
 		}
-#else
-		inline derived_t& stop_all_timed_tasks()
-		{
-			derived_t& derive = static_cast<derived_t&>(*this);
 
-			// Make sure we run on the strand
-			if (!derive.io().strand().running_in_this_thread())
-			{
-				asio::post(derive.io(), make_allocator(derive.wallocator(),
-					[this, this_ptr = derive.selfptr()]() mutable
-				{
-					this->stop_all_timed_tasks();
-				}));
-				return (derive);
-			}
-
-			for (asio::steady_timer* timer : this->timed_tasks_)
-			{
-				timer->cancel(ec_ignore);
-			}
-
-
-			return (derive);
-		}
-#endif
 	protected:
 		/// Used to exit the timer tasks when component is ready to stop.
 		std::set<asio::steady_timer*> timed_tasks_;

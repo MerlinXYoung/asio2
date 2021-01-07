@@ -74,10 +74,30 @@ namespace cereal
         @tparam DataSize The true size of the data
         @ingroup Internal */
     template <std::size_t DataSize>
-    inline void swap_bytes( std::uint8_t * data )
+    inline void swap_bytes( std::uint8_t * data );
+    template<>
+    inline void swap_bytes<1>( std::uint8_t * data )
     {
-      for( std::size_t i = 0, end = DataSize / 2; i < end; ++i )
-        std::swap( data[i], data[DataSize - i - 1] );
+        
+    }
+    template<>
+    inline void swap_bytes<2>( std::uint8_t * data )
+    {
+        std::swap( data[0], data[1] );
+    }
+    template<>
+    inline void swap_bytes<4>( std::uint8_t * data )
+    {
+        std::swap( data[0], data[3] );
+        std::swap( data[1], data[2] );
+    }
+    template<>
+    inline void swap_bytes<8>( std::uint8_t * data )
+    {
+        std::swap( data[0], data[7] );
+        std::swap( data[1], data[6] );
+        std::swap( data[2], data[5] );
+        std::swap( data[3], data[4] );
     }
   } // end namespace rpc_portable_binary_detail
 

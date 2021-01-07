@@ -56,7 +56,6 @@ namespace asio2::detail
 		/**
 		 * @function : emplace the session
 		 */
-#if 1
 		inline void emplace(std::shared_ptr<session_t> session_ptr, std::function<void(bool)> callback)
 		{
 			if (!session_ptr)
@@ -76,32 +75,10 @@ namespace asio2::detail
 
 			
 		}
-#else
-		inline void emplace(std::shared_ptr<session_t> session_ptr, std::function<void(bool)> callback)
-		{
-			if (!session_ptr)
-				return;
-
-			if (!this->io_.running_in_this_thread())
-				return asio::post(this->io_, make_allocator(this->allocator_,
-					std::bind(&self::emplace, this, std::move(session_ptr), std::move(callback))));
-
-			bool inserted = false;
-
-			{
-				std::unique_lock<std::shared_mutex> guard(this->mutex_);
-				inserted = this->sessions_.try_emplace(session_ptr->hash_key(), session_ptr).second;
-				session_ptr->in_sessions_ = inserted;
-			}
-
-			(callback)(inserted);
-		}
-#endif
 
 		/**
 		 * @function : erase the session
 		 */
-#if 1
 		inline void erase(std::shared_ptr<session_t> session_ptr, std::function<void(bool)> callback)
 		{
 			if (!session_ptr)
@@ -123,27 +100,7 @@ namespace asio2::detail
 
 			
 		}
-#else
-		inline void erase(std::shared_ptr<session_t> session_ptr, std::function<void(bool)> callback)
-		{
-			if (!session_ptr)
-				return;
 
-			if (!this->io_.running_in_this_thread())
-				return asio::post(this->io_, make_allocator(this->allocator_,
-					std::bind(&self::erase, this, std::move(session_ptr), std::move(callback))));
-
-			bool erased = false;
-
-			{
-				std::unique_lock<std::shared_mutex> guard(this->mutex_);
-				if (session_ptr->in_sessions_)
-					erased = (this->sessions_.erase(session_ptr->hash_key()) > 0);
-			}
-
-			(callback)(erased);
-		}
-#endif
 		/**
 		 * @function : Submits a completion token or function object for execution.
 		 */

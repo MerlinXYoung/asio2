@@ -65,7 +65,7 @@ namespace asio2::detail
 					// {
 					// 	swap_bytes<sizeof(std::uint16_t)>(reinterpret_cast<std::uint8_t*>(&payload_size));
 					// }
-					payload_size = hton(payload_size);
+					payload_size = ntoh(payload_size);
 
 					i += 2;
 					if (end - i < static_cast<diff_type>(payload_size))
@@ -90,7 +90,7 @@ namespace asio2::detail
 					// {
 					// 	swap_bytes<sizeof(std::uint64_t)>(reinterpret_cast<std::uint8_t*>(&payload_size));
 					// }
-					payload_size = hton(payload_size);
+					payload_size = ntoh(payload_size);
 
 					i += 8;
 					if (end - i < static_cast<diff_type>(payload_size))

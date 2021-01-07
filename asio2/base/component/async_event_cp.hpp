@@ -142,7 +142,6 @@ namespace asio2::detail
 		/**
 		 * @function : Notify all async_events to execute.
 		 */
-#if 1
 		inline derived_t& notify_all_events()
 		{
 			derived_t& derive = static_cast<derived_t&>(*this);
@@ -159,31 +158,7 @@ namespace asio2::detail
 			}));
 			return (derive);
 		}
-#else
-		inline derived_t& notify_all_events()
-		{
-			derived_t& derive = static_cast<derived_t&>(*this);
 
-			// Make sure we run on the strand
-			if (!derive.io().strand().running_in_this_thread())
-			{
-				asio::post(derive.io(), make_allocator(derive.wallocator(),
-					[this, this_ptr = derive.selfptr()]() mutable
-				{
-					this->notify_all_events();
-				}));
-				return (derive);
-			}
-
-			for (auto&[key, event_ptr] : this->async_events_)
-			{
-				asio2::detail::ignore_unused(key);
-				event_ptr->notify();
-			}
-
-			return (derive);
-		}
-#endif
 	protected:
 		/// Used to exit the async_event when component is ready to stop.
 		/// if user don't notify the event to execute, the io_context will

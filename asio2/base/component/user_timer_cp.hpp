@@ -199,7 +199,7 @@ namespace asio2::detail
 				derive._post_user_timers(std::move(timer_obj_ptr), duration, std::move(this_ptr));
 			}));
 		}
-#if 1
+
 		template<class TimerId>
 		inline void stop_timer(TimerId&& timer_id)
 		{
@@ -220,37 +220,12 @@ namespace asio2::detail
 				}
 			}));
 		}
-#else
-		template<class TimerId>
-		inline void stop_timer(TimerId&& timer_id)
-		{
-			derived_t& derive = static_cast<derived_t&>(*this);
 
-			// Make sure we run on the strand
-			if (!derive.io().strand().running_in_this_thread())
-				return asio::post(derive.io(),
-					make_allocator(derive.wallocator(),
-						[this, this_ptr = derive.selfptr(),
-						timer_id = std::forward<TimerId>(timer_id)]() mutable
-			{
-				this->stop_timer(std::move(timer_id));
-			}));
-
-			auto iter = this->user_timers_.find(timer_id);
-			if (iter != this->user_timers_.end())
-			{
-				iter->second->exited = true;
-				iter->second->timer.cancel(ec_ignore);
-				this->user_timers_.erase(iter);
-			}
-		}
-#endif
 		/**
 		 * @function : stop session
 		 * note : this function must be noblocking,if it's blocking,will 
 		 *        cause circle lock in session_mgr::stop function
 		 */
-#if 1
 		inline void stop_all_timers()
 		{
 			derived_t& derive = static_cast<derived_t&>(*this);
@@ -272,30 +247,7 @@ namespace asio2::detail
 
 			
 		}
-#else
-		inline void stop_all_timers()
-		{
-			derived_t& derive = static_cast<derived_t&>(*this);
 
-			// Make sure we run on the strand
-			if (!derive.io().strand().running_in_this_thread())
-				return asio::post(derive.io(),
-					make_allocator(derive.wallocator(),
-						[this, this_ptr = derive.selfptr()]() mutable
-			{
-				this->stop_all_timers();
-			}));
-
-			// close user custom timers
-			for (auto &[id, timer_obj_ptr] : this->user_timers_)
-			{
-				std::ignore = id;
-				timer_obj_ptr->exited = true;
-				timer_obj_ptr->timer.cancel(ec_ignore);
-			}
-			this->user_timers_.clear();
-		}
-#endif
 	protected:
 		template<class Rep, class Period>
 		inline void _post_user_timers(std::shared_ptr<user_timer_obj> timer_obj_ptr,

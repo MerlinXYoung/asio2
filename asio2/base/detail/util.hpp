@@ -354,69 +354,6 @@ namespace asio2::detail
 			ASIO2_ASSERT(false);
 		}
 	}
-#if 0
-	// Returns true if the current machine is little endian
-	inline bool is_little_endian()
-	{
-		static std::int32_t test = 1;
-		return (*reinterpret_cast<std::int8_t*>(&test) == 1);
-	}
-
-	template<class T>
-	void swap(T& a, T& b){
-		a^=b;
-		b^=a;
-		a^=b;
-	}
-	/**
-	 * Swaps the order of bytes for some chunk of memory (reverse_bytes)
-	 * @param data The data as a uint8_t pointer
-	 * @tparam DataSize The true size of the data
-	 */
-	template <std::size_t DataSize>
-	inline void swap_bytes(std::uint8_t * data)
-	{
-		for (std::size_t i = 0, end = DataSize / 2; i < end; ++i)
-			std::swap(data[i], data[DataSize - i - 1]);
-	}
-	template <>
-	inline void swap_bytes<2>(std::uint8_t * data)
-	{
-			std::swap(data[0], data[1]);
-	}
-	template <>
-	inline void swap_bytes<4>(std::uint8_t * data)
-	{
-			std::swap(data[0], data[3]);
-			std::swap(data[1], data[2]);
-	}
-	template <>
-	inline void swap_bytes<8>(std::uint8_t * data)
-	{
-			std::swap(data[0], data[7]);
-			std::swap(data[1], data[6]);
-			std::swap(data[2], data[5]);
-			std::swap(data[3], data[4]);
-	}
-
-	template<class T>
-	inline 
-	typename std::enable_if<std::is_integral<T>::value, T>::type hton(T s){
-		if(is_little_endian()){
-			swap_bytes<sizeof(T)>(reinterpret_cast<std::uint8_t*>(&s));
-		}
-		return s;
-	}
-
-	template<class T>
-	inline 
-	typename std::enable_if<std::is_integral<T>::value, T>::type ntoh(T s){
-		if(is_little_endian()){
-			swap_bytes<sizeof(T)>(reinterpret_cast<std::uint8_t*>(&s));
-		}
-		return s;
-	}
-#endif
 }
 
 // custom specialization of std::hash can be injected in namespace std

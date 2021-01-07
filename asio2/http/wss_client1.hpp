@@ -10,8 +10,8 @@
 
 #if defined(ASIO2_USE_SSL)
 
-#ifndef __ASIO2_WSS_CLIENT_HPP__
-#define __ASIO2_WSS_CLIENT_HPP__
+#ifndef __ASIO2_WSS_CLIENT1_HPP__
+#define __ASIO2_WSS_CLIENT1_HPP__
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 #pragma once
@@ -36,8 +36,8 @@ namespace asio2::detail
 	ASIO2_CLASS_FORWARD_DECLARE_TCP_CLIENT1;
 
 	template<class derived_t, class args_t>
-	class wss_client_impl_t
-		: public tcps_client_impl_t<derived_t, args_t>
+	class wss_client1_impl_t
+		: public tcps_client1_impl_t<derived_t, args_t>
 		, public ws_stream_cp      <derived_t, args_t>
 		, public ws_send_op        <derived_t, args_t>
 	{
@@ -47,8 +47,8 @@ namespace asio2::detail
 	ASIO2_CLASS_FRIEND_DECLARE_TCP_CLIENT1;
 
 	public:
-		using super = tcps_client_impl_t<derived_t, args_t>;
-		using self  = wss_client_impl_t <derived_t, args_t>;
+		using super = tcps_client1_impl_t<derived_t, args_t>;
+		using self  = wss_client1_impl_t <derived_t, args_t>;
 
 		using body_type   = typename args_t::body_t;
 		using buffer_type = typename args_t::buffer_t;
@@ -61,12 +61,12 @@ namespace asio2::detail
 		/**
 		 * @constructor
 		 */
-		explicit wss_client_impl_t(
+		explicit wss_client1_impl_t(io_t& io,
 			asio::ssl::context::method method = asio::ssl::context::sslv23,
 			std::size_t init_buffer_size      = tcp_frame_size,
 			std::size_t max_buffer_size       = (std::numeric_limits<std::size_t>::max)()
 		)
-			: super(method, init_buffer_size, max_buffer_size)
+			: super(io, method, init_buffer_size, max_buffer_size)
 			, ws_stream_cp<derived_t, args_t>()
 			, ws_send_op  <derived_t, args_t>()
 		{
@@ -75,7 +75,7 @@ namespace asio2::detail
 		/**
 		 * @destructor
 		 */
-		~wss_client_impl_t()
+		~wss_client1_impl_t()
 		{
 			this->stop();
 		}
@@ -325,13 +325,13 @@ namespace asio2::detail
 
 namespace asio2
 {
-	class wss_client : public detail::wss_client_impl_t<wss_client, detail::template_args_wss_client>
+	class wss_client1 : public detail::wss_client1_impl_t<wss_client1, detail::template_args_wss_client>
 	{
 	public:
-		using wss_client_impl_t<wss_client, detail::template_args_wss_client>::wss_client_impl_t;
+		using wss_client1_impl_t<wss_client1, detail::template_args_wss_client>::wss_client1_impl_t;
 	};
 }
 
-#endif // !__ASIO2_WSS_CLIENT_HPP__
+#endif // !__ASIO2_WSS_CLIENT1_HPP__
 
 #endif

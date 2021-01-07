@@ -8,14 +8,14 @@
  * (See accompanying file LICENSE or see <http://www.gnu.org/licenses/>)
  */
 
-#ifndef __ASIO2_TCP_CLIENT_HPP__
-#define __ASIO2_TCP_CLIENT_HPP__
+#ifndef __ASIO2_TCP_CLIENT1_HPP__
+#define __ASIO2_TCP_CLIENT1_HPP__
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 #pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <asio2/base/client.hpp>
+#include <asio2/base/client1.hpp>
 
 #include <asio2/base/detail/condition_wrap.hpp>
 #include <asio2/tcp/component/tcp_keepalive_cp.hpp>
@@ -31,8 +31,8 @@ namespace asio2::detail
 	ASIO2_CLASS_FORWARD_DECLARE_TCP_CLIENT1;
 
 	template<class derived_t, class args_t>
-	class tcp_client_impl_t
-		: public client_impl_t         <derived_t, args_t>
+	class tcp_client1_impl_t
+		: public client1_impl_t         <derived_t, args_t>
 		, public tcp_keepalive_cp      <derived_t, args_t>
 		, public tcp_send_op           <derived_t, args_t>
 		, public tcp_recv_op           <derived_t, args_t>
@@ -43,8 +43,8 @@ namespace asio2::detail
 	ASIO2_CLASS_FRIEND_DECLARE_TCP_CLIENT1;
 
 	public:
-		using super = client_impl_t    <derived_t, args_t>;
-		using self  = tcp_client_impl_t<derived_t, args_t>;
+		using super = client1_impl_t    <derived_t, args_t>;
+		using self  = tcp_client1_impl_t<derived_t, args_t>;
 
 		using buffer_type = typename args_t::buffer_t;
 		using send_data_t = typename args_t::send_data_t;
@@ -56,11 +56,12 @@ namespace asio2::detail
 		/**
 		 * @constructor
 		 */
-		explicit tcp_client_impl_t(
+		explicit tcp_client1_impl_t(
+			io_t& io,
 			std::size_t init_buffer_size = tcp_frame_size,
 			std::size_t max_buffer_size = (std::numeric_limits<std::size_t>::max)()
 		)
-			: super(1, init_buffer_size, max_buffer_size)
+			: super(io, init_buffer_size, max_buffer_size)
 			, tcp_keepalive_cp<derived_t, args_t>(this->socket_)
 			, tcp_send_op<derived_t, args_t>()
 			, tcp_recv_op<derived_t, args_t>()
@@ -71,7 +72,7 @@ namespace asio2::detail
 		/**
 		 * @destructor
 		 */
-		~tcp_client_impl_t()
+		~tcp_client1_impl_t()
 		{
 			this->stop();
 		}
@@ -298,7 +299,7 @@ namespace asio2::detail
 				this->derived()._do_stop(asio::error::operation_aborted);
 			}));
 
-			this->iopool_.stop();
+			// this->iopool_.stop();
 		}
 
 	public:
@@ -387,13 +388,13 @@ namespace asio2::detail
 			{
 				clear_last_error();
 
-				this->iopool_.start();
+				// this->iopool_.start();
 
-				if (this->iopool_.is_stopped())
-				{
-					set_last_error(asio::error::shut_down);
-					return false;
-				}
+				// if (this->iopool_.is_stopped())
+				// {
+				// 	set_last_error(asio::error::shut_down);
+				// 	return false;
+				// }
 
 				this->derived()._load_reconnect_timer(host, port, condition);
 
@@ -640,11 +641,11 @@ namespace asio2::detail
 
 namespace asio2
 {
-	class tcp_client : public detail::tcp_client_impl_t<tcp_client, detail::template_args_tcp_client>
+	class tcp_client1 : public detail::tcp_client1_impl_t<tcp_client1, detail::template_args_tcp_client>
 	{
 	public:
-		using tcp_client_impl_t<tcp_client, detail::template_args_tcp_client>::tcp_client_impl_t;
+		using tcp_client1_impl_t<tcp_client1, detail::template_args_tcp_client>::tcp_client1_impl_t;
 	};
 }
 
-#endif // !__ASIO2_TCP_CLIENT_HPP__
+#endif // !__ASIO2_TCP_CLIENT1_HPP__

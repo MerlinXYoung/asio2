@@ -65,6 +65,16 @@
 	template <class, class>                      KEYWORD wss_client_impl_t;         \
 	template <class, class>                      KEYWORD rpc_client_impl_t
 
+#define ASIO2_CLASS_DECLARE_TCP_CLIENT1(KEYWORD)                                     \
+	template <class, class>                      KEYWORD client1_impl_t;             \
+	template <class, class>                      KEYWORD tcp_client1_impl_t;         \
+	template <class, class>                      KEYWORD tcps_client1_impl_t;        \
+	template <class, class>                      KEYWORD http_client1_impl_t;        \
+	template <class, class>                      KEYWORD https_client1_impl_t;       \
+	template <class, class>                      KEYWORD ws_client1_impl_t;          \
+	template <class, class>                      KEYWORD wss_client1_impl_t;         \
+	template <class, class>                      KEYWORD rpc_client1_impl_t
+
 
 #define ASIO2_CLASS_DECLARE_TCP_SERVER(KEYWORD)                                     \
 	template <class, class>                      KEYWORD server_impl_t;             \
@@ -98,6 +108,10 @@
 	template <class, class>                      KEYWORD client_impl_t;             \
 	template <class, class>                      KEYWORD udp_client_impl_t
 
+#define ASIO2_CLASS_DECLARE_UDP_CLIENT1(KEYWORD)                                     \
+	template <class, class>                      KEYWORD client1_impl_t;             \
+	template <class, class>                      KEYWORD udp_client1_impl_t
+
 
 #define ASIO2_CLASS_DECLARE_UDP_SERVER(KEYWORD)                                     \
 	template <class, class>                      KEYWORD server_impl_t;             \
@@ -118,11 +132,13 @@
 
 #define ASIO2_CLASS_FORWARD_DECLARE_TCP_BASE    ASIO2_CLASS_DECLARE_TCP_BASE   (class)
 #define ASIO2_CLASS_FORWARD_DECLARE_TCP_CLIENT  ASIO2_CLASS_DECLARE_TCP_CLIENT (class)
+#define ASIO2_CLASS_FORWARD_DECLARE_TCP_CLIENT1  ASIO2_CLASS_DECLARE_TCP_CLIENT1 (class)
 #define ASIO2_CLASS_FORWARD_DECLARE_TCP_SERVER  ASIO2_CLASS_DECLARE_TCP_SERVER (class)
 #define ASIO2_CLASS_FORWARD_DECLARE_TCP_SESSION ASIO2_CLASS_DECLARE_TCP_SESSION(class)
 
 #define ASIO2_CLASS_FRIEND_DECLARE_TCP_BASE     ASIO2_CLASS_DECLARE_TCP_BASE   (friend class)
 #define ASIO2_CLASS_FRIEND_DECLARE_TCP_CLIENT   ASIO2_CLASS_DECLARE_TCP_CLIENT (friend class)
+#define ASIO2_CLASS_FRIEND_DECLARE_TCP_CLIENT1   ASIO2_CLASS_DECLARE_TCP_CLIENT1 (friend class)
 #define ASIO2_CLASS_FRIEND_DECLARE_TCP_SERVER   ASIO2_CLASS_DECLARE_TCP_SERVER (friend class)
 #define ASIO2_CLASS_FRIEND_DECLARE_TCP_SESSION  ASIO2_CLASS_DECLARE_TCP_SESSION(friend class)
 
@@ -130,11 +146,13 @@
 
 #define ASIO2_CLASS_FORWARD_DECLARE_UDP_BASE    ASIO2_CLASS_DECLARE_UDP_BASE   (class)
 #define ASIO2_CLASS_FORWARD_DECLARE_UDP_CLIENT  ASIO2_CLASS_DECLARE_UDP_CLIENT (class)
+#define ASIO2_CLASS_FORWARD_DECLARE_UDP_CLIENT1  ASIO2_CLASS_DECLARE_UDP_CLIENT1 (class)
 #define ASIO2_CLASS_FORWARD_DECLARE_UDP_SERVER  ASIO2_CLASS_DECLARE_UDP_SERVER (class)
 #define ASIO2_CLASS_FORWARD_DECLARE_UDP_SESSION ASIO2_CLASS_DECLARE_UDP_SESSION(class)
 
 #define ASIO2_CLASS_FRIEND_DECLARE_UDP_BASE     ASIO2_CLASS_DECLARE_UDP_BASE   (friend class)
 #define ASIO2_CLASS_FRIEND_DECLARE_UDP_CLIENT   ASIO2_CLASS_DECLARE_UDP_CLIENT (friend class)
+#define ASIO2_CLASS_FRIEND_DECLARE_UDP_CLIENT1   ASIO2_CLASS_DECLARE_UDP_CLIENT1 (friend class)
 #define ASIO2_CLASS_FRIEND_DECLARE_UDP_SERVER   ASIO2_CLASS_DECLARE_UDP_SERVER (friend class)
 #define ASIO2_CLASS_FRIEND_DECLARE_UDP_SESSION  ASIO2_CLASS_DECLARE_UDP_SESSION(friend class)
 

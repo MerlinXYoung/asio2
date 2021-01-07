@@ -37,6 +37,7 @@ namespace asio2::detail
 	ASIO2_CLASS_FORWARD_DECLARE_BASE;
 	ASIO2_CLASS_FORWARD_DECLARE_UDP_BASE;
 	ASIO2_CLASS_FORWARD_DECLARE_UDP_CLIENT;
+	ASIO2_CLASS_FORWARD_DECLARE_UDP_CLIENT1;
 
 	template<class derived_t, class args_t>
 	class udp_client_impl_t
@@ -46,6 +47,7 @@ namespace asio2::detail
 		ASIO2_CLASS_FRIEND_DECLARE_BASE;
 		ASIO2_CLASS_FRIEND_DECLARE_UDP_BASE;
 		ASIO2_CLASS_FRIEND_DECLARE_UDP_CLIENT;
+	ASIO2_CLASS_FRIEND_DECLARE_UDP_CLIENT1;
 
 	public:
 		using super = client_impl_t    <derived_t, args_t>;

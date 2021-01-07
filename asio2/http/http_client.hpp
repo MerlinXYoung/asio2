@@ -34,6 +34,7 @@ namespace asio2::detail
 	ASIO2_CLASS_FORWARD_DECLARE_BASE;
 	ASIO2_CLASS_FORWARD_DECLARE_TCP_BASE;
 	ASIO2_CLASS_FORWARD_DECLARE_TCP_CLIENT;
+	ASIO2_CLASS_FORWARD_DECLARE_TCP_CLIENT1;
 
 	template<class derived_t, class args_t>
 	class http_client_impl_t
@@ -45,6 +46,7 @@ namespace asio2::detail
 		ASIO2_CLASS_FRIEND_DECLARE_BASE;
 		ASIO2_CLASS_FRIEND_DECLARE_TCP_BASE;
 		ASIO2_CLASS_FRIEND_DECLARE_TCP_CLIENT;
+	ASIO2_CLASS_FRIEND_DECLARE_TCP_CLIENT1;
 
 	public:
 		using super = tcp_client_impl_t <derived_t, args_t>;

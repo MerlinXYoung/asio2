@@ -10,8 +10,8 @@
 
 #if defined(ASIO2_USE_SSL)
 
-#ifndef __ASIO2_TCPS_CLIENT_HPP__
-#define __ASIO2_TCPS_CLIENT_HPP__
+#ifndef __ASIO2_TCPS_CLIENT1_HPP__
+#define __ASIO2_TCPS_CLIENT1_HPP__
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 #pragma once
@@ -29,9 +29,9 @@ namespace asio2::detail
 	ASIO2_CLASS_FORWARD_DECLARE_TCP_CLIENT1;
 
 	template<class derived_t, class args_t>
-	class tcps_client_impl_t
+	class tcps_client1_impl_t
 		: public ssl_context_cp    <derived_t, false >
-		, public tcp_client_impl_t <derived_t, args_t>
+		, public tcp_client1_impl_t <derived_t, args_t>
 		, public ssl_stream_cp     <derived_t, args_t>
 	{
 		ASIO2_CLASS_FRIEND_DECLARE_BASE;
@@ -40,8 +40,8 @@ namespace asio2::detail
 	ASIO2_CLASS_FRIEND_DECLARE_TCP_CLIENT1;
 
 	public:
-		using super = tcp_client_impl_t <derived_t, args_t>;
-		using self  = tcps_client_impl_t<derived_t, args_t>;
+		using super = tcp_client1_impl_t <derived_t, args_t>;
+		using self  = tcps_client1_impl_t<derived_t, args_t>;
 
 		using buffer_type = typename args_t::buffer_t;
 
@@ -53,21 +53,21 @@ namespace asio2::detail
 		/**
 		 * @constructor
 		 */
-		explicit tcps_client_impl_t(
+		explicit tcps_client1_impl_t(io_t& io,
 			asio::ssl::context::method method = asio::ssl::context::sslv23,
 			std::size_t init_buffer_size      = tcp_frame_size,
 			std::size_t max_buffer_size       = (std::numeric_limits<std::size_t>::max)()
 		)
 			: ssl_context_comp(method)
-			, super(init_buffer_size, max_buffer_size)
-			, ssl_stream_comp(this->io_, *this, asio::ssl::stream_base::client)
+			, super(io, init_buffer_size, max_buffer_size)
+			, ssl_stream_comp(io, *this, asio::ssl::stream_base::client)
 		{
 		}
 
 		/**
 		 * @destructor
 		 */
-		~tcps_client_impl_t()
+		~tcps_client1_impl_t()
 		{
 			this->stop();
 		}
@@ -143,13 +143,13 @@ namespace asio2::detail
 
 namespace asio2
 {
-	class tcps_client : public detail::tcps_client_impl_t<tcps_client, detail::template_args_tcp_client>
+	class tcps_client1 : public detail::tcps_client1_impl_t<tcps_client1, detail::template_args_tcp_client>
 	{
 	public:
-		using tcps_client_impl_t<tcps_client, detail::template_args_tcp_client>::tcps_client_impl_t;
+		using tcps_client1_impl_t<tcps_client1, detail::template_args_tcp_client>::tcps_client1_impl_t;
 	};
 }
 
-#endif // !__ASIO2_TCPS_CLIENT_HPP__
+#endif // !__ASIO2_TCPS_CLIENT1_HPP__
 
 #endif

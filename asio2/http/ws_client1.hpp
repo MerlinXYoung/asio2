@@ -8,26 +8,25 @@
  * (See accompanying file LICENSE or see <http://www.gnu.org/licenses/>)
  */
 
-#if defined(ASIO2_USE_SSL)
-
-#ifndef __ASIO2_WSS_CLIENT_HPP__
-#define __ASIO2_WSS_CLIENT_HPP__
+#ifndef __ASIO2_WS_CLIENT1_HPP__
+#define __ASIO2_WS_CLIENT1_HPP__
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 #pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#include <asio2/tcp/tcps_client.hpp>
-#include <asio2/http/ws_client.hpp>
+#include <asio2/tcp/tcp_client1.hpp>
 #include <asio2/http/detail/http_util.hpp>
 #include <asio2/http/component/ws_stream_cp.hpp>
 #include <asio2/http/impl/ws_send_op.hpp>
 
 namespace asio2::detail
 {
-	struct template_args_wss_client : public template_args_ws_client
+	struct template_args_ws_client : public template_args_tcp_client
 	{
-		using stream_t    = websocket::stream<asio::ssl::stream<asio::ip::tcp::socket&>&>;
+		using stream_t    = websocket::stream<asio::ip::tcp::socket&>;
+		using body_t      = http::string_body;
+		using buffer_t    = beast::flat_buffer;
 	};
 
 	ASIO2_CLASS_FORWARD_DECLARE_BASE;
@@ -36,10 +35,10 @@ namespace asio2::detail
 	ASIO2_CLASS_FORWARD_DECLARE_TCP_CLIENT1;
 
 	template<class derived_t, class args_t>
-	class wss_client_impl_t
-		: public tcps_client_impl_t<derived_t, args_t>
-		, public ws_stream_cp      <derived_t, args_t>
-		, public ws_send_op        <derived_t, args_t>
+	class ws_client1_impl_t
+		: public tcp_client1_impl_t<derived_t, args_t>
+		, public ws_stream_cp     <derived_t, args_t>
+		, public ws_send_op       <derived_t, args_t>
 	{
 		ASIO2_CLASS_FRIEND_DECLARE_BASE;
 		ASIO2_CLASS_FRIEND_DECLARE_TCP_BASE;
@@ -47,8 +46,8 @@ namespace asio2::detail
 	ASIO2_CLASS_FRIEND_DECLARE_TCP_CLIENT1;
 
 	public:
-		using super = tcps_client_impl_t<derived_t, args_t>;
-		using self  = wss_client_impl_t <derived_t, args_t>;
+		using super = tcp_client1_impl_t<derived_t, args_t>;
+		using self  = ws_client1_impl_t <derived_t, args_t>;
 
 		using body_type   = typename args_t::body_t;
 		using buffer_type = typename args_t::buffer_t;
@@ -61,12 +60,11 @@ namespace asio2::detail
 		/**
 		 * @constructor
 		 */
-		explicit wss_client_impl_t(
-			asio::ssl::context::method method = asio::ssl::context::sslv23,
-			std::size_t init_buffer_size      = tcp_frame_size,
-			std::size_t max_buffer_size       = (std::numeric_limits<std::size_t>::max)()
+		explicit ws_client1_impl_t(io_t& io,
+			std::size_t init_buffer_size = tcp_frame_size,
+			std::size_t max_buffer_size  = (std::numeric_limits<std::size_t>::max)()
 		)
-			: super(method, init_buffer_size, max_buffer_size)
+			: super(io,init_buffer_size, max_buffer_size)
 			, ws_stream_cp<derived_t, args_t>()
 			, ws_send_op  <derived_t, args_t>()
 		{
@@ -75,7 +73,7 @@ namespace asio2::detail
 		/**
 		 * @destructor
 		 */
-		~wss_client_impl_t()
+		~ws_client1_impl_t()
 		{
 			this->stop();
 		}
@@ -247,7 +245,7 @@ namespace asio2::detail
 		{
 			super::_do_init(condition);
 
-			this->derived()._ws_init(condition, this->ssl_stream());
+			this->derived()._ws_init(condition, this->socket_);
 		}
 
 		inline void _handle_disconnect(const error_code& ec, std::shared_ptr<derived_t> this_ptr)
@@ -267,23 +265,7 @@ namespace asio2::detail
 			if (ec)
 				return this->derived()._done_connect(ec, std::move(this_ptr), std::move(condition));
 
-			this->derived()._ssl_start(this_ptr, condition, this->socket_, *this);
-
-			this->derived()._ws_start(this_ptr, condition, this->ssl_stream());
-
-			this->derived()._post_handshake(std::move(this_ptr), std::move(condition));
-		}
-
-		template<typename MatchCondition>
-		inline void _handle_handshake(const error_code & ec, std::shared_ptr<derived_t> this_ptr,
-			condition_wrap<MatchCondition> condition)
-		{
-			set_last_error(ec);
-
-			this->derived()._fire_handshake(this_ptr, ec);
-
-			if (ec)
-				return this->derived()._done_connect(ec, std::move(this_ptr), std::move(condition));
+			this->derived()._ws_start(this_ptr, condition, this->socket_);
 
 			this->derived()._post_control_callback(this_ptr, condition);
 			this->derived()._post_upgrade(std::move(this_ptr), std::move(condition), this->upgrade_rep_);
@@ -297,7 +279,8 @@ namespace asio2::detail
 
 	protected:
 		template<typename MatchCondition>
-		inline void _post_recv(std::shared_ptr<derived_t> this_ptr, condition_wrap<MatchCondition> condition)
+		inline void _post_recv(std::shared_ptr<derived_t> this_ptr,
+			condition_wrap<MatchCondition> condition)
 		{
 			this->derived()._ws_post_recv(std::move(this_ptr), std::move(condition));
 		}
@@ -325,13 +308,11 @@ namespace asio2::detail
 
 namespace asio2
 {
-	class wss_client : public detail::wss_client_impl_t<wss_client, detail::template_args_wss_client>
+	class ws_client1 : public detail::ws_client1_impl_t<ws_client1, detail::template_args_ws_client>
 	{
 	public:
-		using wss_client_impl_t<wss_client, detail::template_args_wss_client>::wss_client_impl_t;
+		using ws_client1_impl_t<ws_client1, detail::template_args_ws_client>::ws_client1_impl_t;
 	};
 }
 
-#endif // !__ASIO2_WSS_CLIENT_HPP__
-
-#endif
+#endif // !__ASIO2_WS_CLIENT1_HPP__

@@ -80,6 +80,12 @@ namespace asio2::detail
 		~connect_cp() = default;
 
 	protected:
+		template<class, class = std::void_t<>>
+		struct has_member_iopool : std::false_type {};
+
+		template<class T>
+		struct has_member_iopool<T, std::void_t<decltype(T::iopool_)>> : std::true_type {};
+
 		template<bool isAsync, typename String, typename StrOrInt, typename MatchCondition,
 			bool IsSession = args_t::is_session>
 		typename std::enable_if_t<!IsSession, bool>
@@ -87,13 +93,15 @@ namespace asio2::detail
 			std::shared_ptr<derived_t> this_ptr, condition_wrap<MatchCondition> condition)
 		{
 			derived_t& derive = static_cast<derived_t&>(*this);
-
+			
 			try
 			{
-				if (derive.iopool_.is_stopped())
-				{
-					set_last_error(asio::error::shut_down);
-					return false;
+				if constexpr (has_member_iopool<derived_t>::value){
+					if (derive.iopool_.is_stopped())
+					{
+						set_last_error(asio::error::shut_down);
+						return false;
+					}
 				}
 
 				this->host_ = to_string(std::forward<String>(host));

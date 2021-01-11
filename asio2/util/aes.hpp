@@ -20,6 +20,7 @@
 #include <vector>
 #include <array>
 #include <sstream>
+#include <string_view>
 
 namespace asio2
 {
@@ -49,6 +50,10 @@ namespace asio2
 		 * if key.size() > 24, key will be resized to 32 and padded with '\0',
 		 */
 		aes(std::string key) : key_(std::move(key))
+		{
+			init();
+		}
+		aes(std::string_view key):key_(key.data(), key.size())
 		{
 			init();
 		}

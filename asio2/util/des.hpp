@@ -18,6 +18,7 @@
 #include <cstring>
 #include <string>
 #include <sstream>
+#include <string_view>
 
 namespace asio2
 {
@@ -36,6 +37,12 @@ namespace asio2
 		{
 			uint64_t k = 0;
 			key.resize(sizeof(k));
+			std::memcpy((void *)&k, (const void *)key.data(), sizeof(k));
+			keygen(k);
+		}
+		des(std::string_view key)
+		{
+			uint64_t k = 0;
 			std::memcpy((void *)&k, (const void *)key.data(), sizeof(k));
 			keygen(k);
 		}

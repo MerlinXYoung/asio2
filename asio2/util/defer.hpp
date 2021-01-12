@@ -45,6 +45,16 @@ namespace asio2
 			if (this->fn_) this->fn_();
 		}
 
+		std::function<void()>&& release() noexcept{ 
+#if 0
+			std::function<void()> empty;
+			std::swap(empty, fn_);
+			return std::move(empty);
+#else
+			return std::move(fn_);
+#endif
+		}
+
 	protected:
 		std::function<void()> fn_;
 	};
